@@ -1,6 +1,12 @@
 import { gql } from 'apollo-server-express';
 
 export default /* GraphQL */ gql`
+	enum UserType {
+		NORMAL_USER
+		SERVICE_USER
+		ADMIN_USER
+	}
+
 	type User {
 		email: String
 		isAdmin: Boolean
@@ -8,6 +14,7 @@ export default /* GraphQL */ gql`
 		uuid: String
 		registrationDate: String
 		lastLogin: String
+		userType: UserType!
 	}
 
 	type Query {

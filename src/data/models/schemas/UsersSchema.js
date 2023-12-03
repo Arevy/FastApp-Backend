@@ -10,6 +10,11 @@ const Schema = mongoose.Schema;
  * @classdesc User have interesting properties. Some of them are isAdmin (false by default), isActive (true by default. Useful for removing login permission to the registered users), uuid (random and unique token. Created to provided a random identifier token for every user different than _id native MongoDB value)
  */
 const UsersSchema = new Schema({
+	userType: {
+		type: String,
+		enum: ["NORMAL_USER", "SERVICE_USER", "ADMIN_USER"],
+		required: true
+	},
 	email: {
 		type: String,
 		required: true,
