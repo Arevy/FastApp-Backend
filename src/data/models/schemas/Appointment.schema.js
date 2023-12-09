@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
 const AppointmentsSchema = new Schema({
-    userId: {
+    uuid: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
