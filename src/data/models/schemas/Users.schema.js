@@ -51,8 +51,14 @@ const UsersSchema = new Schema({
 		type: Date,
 		required: true,
 		default: Date.now
-	}
+	},
+	appointments: [{
+		type: mongoose.Schema.Types.ObjectId,
+		ref: 'Appointment'
+	}]
 });
+
+
 
 /**
  * Hash the password of user before save on database

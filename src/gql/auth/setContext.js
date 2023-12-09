@@ -1,9 +1,10 @@
 import { validateAuthToken, createAuthToken } from './jwt.js';
 import { environmentVariablesConfig } from '../../config/appConfig.js';
 import { authValidations } from '../auth/authValidations.js';
+import { serviceValidations } from '../auth/serviceValidation.js';
 import { ENVIRONMENT } from '../../config/environment.js';
 import { logger } from '../../helpers/logger.js';
-import { models } from '../../data/models/index.js';
+import { models } from '../../data/models/index.models.js';
 
 /**
  * Context function from Apollo Server
@@ -19,6 +20,9 @@ export const setContext = async ({ req }) => {
 			},
 			jwt: {
 				createAuthToken: createAuthToken
+			},
+			serviceValidation: {
+				...serviceValidations
 			}
 		}
 	};
