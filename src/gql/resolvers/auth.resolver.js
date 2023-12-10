@@ -6,8 +6,8 @@ import { isValidEmail, isStrongPassword } from '../../helpers/validations.js';
 
 export default {
 	Query: {
-		usersByType: async (_, { userType }) => {
-			return await User.find({ userType });
+		usersByType: async (_, { userType }, context) => {
+			return await context.di.model.Users.find({ userType });
 		},
 	},
 	Mutation: {
@@ -44,6 +44,31 @@ export default {
 			return {
 				token: context.di.jwt.createAuthToken(user.email, user.isAdmin, user.isActive, user.uuid)
 			};
+		},
+
+		updatePassword: async (_, { uuid, newPassword }, context) => {
+			// if (!isStrongPassword(newPassword)) {
+			// 	throw new UserInputError('The new password is not secure enough');
+			// }
+
+			const hashedPassword = await bcrypt.hash(newPassword, 10);
+			const updateResult = await context.di.model.Users.findOneAndUpdate({ uuid }, { password: hashedPassword }, { new: true }).lean();
+
+			if (updateResult.password === hashedPassword) {
+				return { success: true, message: "Password successfully updated." };
+			} else {
+				return { success: false, message: "Password update failed." };
+			}
+		},
+
+		updateIsActive: async (_, { uuid, newIsActive }, context) => {
+			const updateResult = await context.di.model.Users.findOneAndUpdate({ uuid }, { isActive: newIsActive }, { new: true }).lean();
+
+			if (updateResult.isActive === newIsActive) {
+				return { success: true, message: "isActive status successfully updated." };
+			} else {
+				return { success: false, message: "isActive status update failed." };
+			}
 		},
 		/**
 		 * It allows users to authenticate. Users with property isActive with value false are not allowed to authenticate. When an user authenticates the value of lastLogin will be updated
