@@ -8,13 +8,14 @@ export default /* GraphQL */ gql`
 	}
 
 	type User {
-		email: String
+		email: String!
 		isAdmin: Boolean
 		isActive: Boolean
-		uuid: String
-		registrationDate: String
+		uuid: String!
+		registrationDate: String!
 		lastLogin: String
 		userType: UserType!
+		password: String
 	}
 
 	type Query {

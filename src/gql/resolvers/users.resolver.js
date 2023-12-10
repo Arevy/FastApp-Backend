@@ -13,7 +13,7 @@ export default {
 			// context.di.authValidation.ensureThatUserIsAdministrator(context);
 
 			const sortCriteria = { isAdmin: 'desc', registrationDate: 'asc' };
-			return context.di.model.Users.find().sort(sortCriteria).lean();
+			return await context.di.model.Users.find().sort(sortCriteria).lean();
 		}
 	},
 	Mutation: {

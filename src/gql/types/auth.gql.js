@@ -15,6 +15,11 @@ export default /* GraphQL */ gql`
 		usersByType(userType: UserType!): [User]
 	}
 
+	type DeleteResult {
+        success: Boolean!
+        message: String
+    }
+	
 	type Mutation {
 		""" It allows users to register """
 		registerUser(email: String!, password: String!, userType: UserType!): Token

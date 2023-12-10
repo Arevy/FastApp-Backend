@@ -58,13 +58,14 @@ export default {
 			if (!user) {
 				throw new UserInputError('User not found or login not allowed');
 			}
-
+			/** Verify pass - uncomment me please
 			const isCorrectPassword = await bcrypt.compare(password, user.password);
 
+			
 			if (!isCorrectPassword) {
 				throw new UserInputError('Invalid credentials');
 			}
-
+			 */
 			await context.di.model.Users.findOneAndUpdate({ email }, { lastLogin: new Date().toISOString() }, { new: true }).lean();
 
 			return {
@@ -78,8 +79,25 @@ export default {
 			context.di.authValidation.ensureThatUserIsLogged(context);
 
 			const user = await context.di.authValidation.getUser(context);
+			if (!user) {
+				return {
+					success: false,
+					message: "User not found."
+				};
+			}
+			const deleteUserResult = await context.di.model.Users.deleteOne({ uuid: user.uuid });
 
-			return context.di.model.Users.deleteOne({ uuid: user.uuid });
+			if (deleteUserResult.deletedCount === 1) {
+				return {
+					success: true,
+					message: "User successfully deleted."
+				};
+			} else {
+				return {
+					success: false,
+					message: "User deletion failed."
+				};
+			}
 		}
 	}
 };
