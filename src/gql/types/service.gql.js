@@ -31,10 +31,13 @@ export default /* GraphQL */ gql`
     }
 
     type Appointment {
-        id: ID!
-        user: User!
-        service: ServiceType!
+        uuid: ID!
+        userId: ID!
+        serviceId: ID!
         date: String!
         status: String!
     }
 `;
+// for   type Appointment { 
+// service: ServiceType!
+// user: User!
