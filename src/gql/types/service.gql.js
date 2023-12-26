@@ -38,6 +38,3 @@ export default /* GraphQL */ gql`
         status: String!
     }
 `;
-// for   type Appointment { 
-// service: ServiceType!
-// user: User!

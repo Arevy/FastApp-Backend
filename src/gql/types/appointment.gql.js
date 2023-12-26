@@ -10,11 +10,36 @@ export default /* GraphQL */ gql`
     type Query {
         userAppointments(uuid: ID!): [Appointment]
         """ Get list of all Appointments on database """
-        listAllAppointments: [Appointment]
+        listAllAppointmentsShort: [Appointment]
+        listAllAppointmentsFull: [Appointments]
     }
     
     type DeleteResult {
         success: Boolean!
         message: String
     }
+
+    type Appointments{
+        uuid: ID!
+        user: User!
+        service: Service!
+        date: String!
+        status: String!
+    }
+
+    type User{
+        email: String!
+        isAdmin: Boolean
+        isActive: Boolean
+        uuid: String!
+        registrationDate: String!
+        lastLogin: String
+        userType: UserType!
+    }
+    
+    type Service{
+        serviceId: ID!
+        name: String
+        category: String
+    } 
 `;

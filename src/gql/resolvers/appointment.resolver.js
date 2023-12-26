@@ -6,7 +6,7 @@ export default {
             // Access Appointment model from context
             return await context.di.model.Appointment.find({ uuid: userId }).populate('serviceId');
         },
-        listAllAppointments: async (parent, args, context) => {
+        listAllAppointmentsShort: async (parent, args, context) => {
 
             const sortCriteria = { isAdmin: 'desc', registrationDate: 'asc' };
             return await context.di.model.Appointment.find().sort(sortCriteria).lean();
@@ -45,8 +45,53 @@ export default {
             //             $sort: { date: 1 } // Sort by date or any other desired criteria
             //         }
             //     ]);
-        }
+        },
+        listAllAppointmentsFull: async (parent, args, context) => {
+            return await context.di.model.Appointment.aggregate([
+                {
+                    $lookup: {
+                        from: "users",
+                        localField: "userId",
+                        foreignField: "_id",
+                        as: "user"
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "services",
+                        localField: "serviceId",
+                        foreignField: "_id",
+                        as: "service"
+                    }
+                },
+                { $unwind: "$user" },
+                { $unwind: "$service" },
+                {
+                    $project: {
+                        uuid: 1,
+                        user: {
+                            userId: "$user._id",
+                            email: "$user.email",
+                            isAdmin: "$user.isAdmin",
+                            isActive: "$user.isActive",
+                            uuid: "$user.uuid",
+                            registrationDate: "$user.registrationDate",
+                            lastLogin: "$user.lastLogin",
+                            userType: "$user.userType",
+                        },
+                        service: {
+                            serviceId: "$service._id",
+                            name: "$service.name",
+                            category: "$service.category"
+                        },
+                        date: 1,
+                        status: 1
+                    }
+                }
+            ]);
+        },
     },
+    
     Mutation: {
         createAppointment: async (_, { userId, serviceId, date }, context) => {
             const uuid = uuidv4(); // Generate a unique serviceId
