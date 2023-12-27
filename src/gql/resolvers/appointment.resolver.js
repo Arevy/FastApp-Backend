@@ -1,15 +1,16 @@
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
 export default {
     Query: {
         userAppointments: async (_, { userId }, context) => {
             // Access Appointment model from context
-            return await context.di.model.Appointment.find({ uuid: userId }).populate('serviceId');
+            return await context.di.model.Appointment.find({ userId }).lean();
         },
         listAllAppointmentsShort: async (parent, args, context) => {
-
-            const sortCriteria = { isAdmin: 'desc', registrationDate: 'asc' };
-            return await context.di.model.Appointment.find().sort(sortCriteria).lean();
+            const sortCriteria = { isAdmin: "desc", registrationDate: "asc" };
+            return await context.di.model.Appointment.find()
+                .sort(sortCriteria)
+                .lean();
 
             //    ====> complex version for aggregate data
             //     return await context.di.model.Appointment.aggregate([
@@ -53,16 +54,16 @@ export default {
                         from: "users",
                         localField: "userId",
                         foreignField: "_id",
-                        as: "user"
-                    }
+                        as: "user",
+                    },
                 },
                 {
                     $lookup: {
                         from: "services",
                         localField: "serviceId",
                         foreignField: "_id",
-                        as: "service"
-                    }
+                        as: "service",
+                    },
                 },
                 { $unwind: "$user" },
                 { $unwind: "$service" },
@@ -82,16 +83,16 @@ export default {
                         service: {
                             serviceId: "$service._id",
                             name: "$service.name",
-                            category: "$service.category"
+                            category: "$service.category",
                         },
                         date: 1,
-                        status: 1
-                    }
-                }
+                        status: 1,
+                    },
+                },
             ]);
         },
     },
-    
+
     Mutation: {
         createAppointment: async (_, { userId, serviceId, date }, context) => {
             const uuid = uuidv4(); // Generate a unique serviceId
@@ -102,7 +103,6 @@ export default {
             return data;
         },
         updateAppointment: async (_, { uuid, newDate, newStatus }, context) => {
-
             // Update an appointment using the Appointment model from context
             const updateAppointmentData = {};
             if (newDate) updateAppointmentData.date = newDate;
@@ -112,18 +112,20 @@ export default {
                 updateAppointmentData,
                 { new: true }
             );
-
-
         },
         deleteAppointment: async (_, { uuid }, context) => {
             // Delete an appointment using the Appointment model from context
-            const result = await context.di.model.Appointment.deleteOne({ _id: uuid });
+            const result = await context.di.model.Appointment.deleteOne({
+                _id: uuid,
+            });
             return {
                 success: result.deletedCount === 1,
-                message: result.deletedCount === 1 ? 'Appointment deleted successfully' : 'Error deleting appointment'
+                message:
+                    result.deletedCount === 1
+                        ? "Appointment deleted successfully"
+                        : "Error deleting appointment",
             };
         },
     },
     // ... other resolvers ...
 };
-

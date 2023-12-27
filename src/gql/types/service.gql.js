@@ -14,7 +14,7 @@ export default /* GraphQL */ gql`
     }
 
     type Query {
-        appointmentsForServiceUser(serviceUserId: ID!): [Appointment]
+        serviceAppointments(serviceId: ID!): [Appointment]
         allAppointments: [Appointment]
         getService(serviceId: ID!): ServiceType
         listAllServices: [ServiceType]

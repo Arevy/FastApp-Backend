@@ -8,7 +8,7 @@ export default /* GraphQL */ gql`
     }
   
     type Query {
-        userAppointments(uuid: ID!): [Appointment]
+        userAppointments(userId: ID!): [Appointment]
         """ Get list of all Appointments on database """
         listAllAppointmentsShort: [Appointment]
         listAllAppointmentsFull: [Appointments]
