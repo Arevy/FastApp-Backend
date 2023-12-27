@@ -9,6 +9,8 @@ COPY . .
 
 # Install any needed packages specified in package.json
 RUN npm install
+RUN npm install -g nodemon
+RUN npm install -g mongoose
 
 # Make port available to the world outside this container
 EXPOSE 4000
