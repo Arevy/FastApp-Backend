@@ -9,12 +9,12 @@ export default {
     Query: {
         // ... existing resolvers ...
 
-        appointmentsForServiceUser: async (_, { serviceUserId }, context) => {
+        serviceAppointments: async (_, { serviceId }, context) => {
             // Ensure the user has the right to view these appointments
-            await context.di.authValidation.ensureUserCanViewServiceAppointments(context, serviceUserId);
+            await context.di.authValidation.ensureUserCanViewServiceAppointments(context, serviceId);
 
             // If validation passes, list the appointments
-            return await context.di.model.Appointment.find({ serviceId: serviceUserId }).populate('userId');
+            return await context.di.model.Appointment.find({ serviceId});
         },
 
         allAppointments: async (_, args, context) => {

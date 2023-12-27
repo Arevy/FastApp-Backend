@@ -14,7 +14,7 @@ export default /* GraphQL */ gql`
     }
 
     type Query {
-        appointmentsForServiceUser(serviceUserId: ID!): [Appointment]
+        serviceAppointments(serviceId: ID!): [Appointment]
         allAppointments: [Appointment]
         getService(serviceId: ID!): ServiceType
         listAllServices: [ServiceType]
@@ -31,9 +31,9 @@ export default /* GraphQL */ gql`
     }
 
     type Appointment {
-        id: ID!
-        user: User!
-        service: ServiceType!
+        uuid: ID!
+        userId: ID!
+        serviceId: ID!
         date: String!
         status: String!
     }

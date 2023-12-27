@@ -19,7 +19,12 @@ export default /* GraphQL */ gql`
         success: Boolean!
         message: String
     }
-	
+
+	type UpdateResult {
+		success: Boolean!
+		message: String
+	}
+
 	type Mutation {
 		""" It allows users to register """
 		registerUser(email: String!, password: String!, userType: UserType!): Token
@@ -29,5 +34,11 @@ export default /* GraphQL */ gql`
 
 		""" It allows to user to delete their account permanently """
 		deleteMyUserAccount: DeleteResult
+
+		""" It allows to user to change account password """
+		updatePassword(uuid: ID!, newPassword: String!): UpdateResult
+
+		""" It allows to user/admin to change account status """
+		updateIsActive(uuid: ID!, newIsActive: Boolean!): UpdateResult
 	}
 `;

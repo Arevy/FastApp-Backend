@@ -4,6 +4,11 @@ const Schema = mongoose.Schema;
 
 const AppointmentsSchema = new Schema({
     uuid: {
+        type: mongoose.Schema.Types.String,
+        ref: 'Appoiment',
+        required: false
+    },
+    userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
