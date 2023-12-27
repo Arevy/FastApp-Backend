@@ -1,65 +1,189 @@
 # ⚡️ Fast App: Backend with Node + GraphQL + MongoDB
 
-This project is an easy and fast way to start new projects in JavaScript. 
-The main goal is to provide two repositories: one for the backend and one for the frontend application. 
+This project, part of a boilerplate series, offers a fast-track approach for starting new JavaScript projects. It's designed to work independently or in tandem with a corresponding frontend repository.
 
-If you prefer it, you can use one of these boilerplates without using the other! Feel free to explore any ideas like developing your own backend in PHP or your frontend in Angular, for example.
+### 🎁 Technologies
+The backend is powered by **Node.js, GraphQL, Apollo Server, Express, and Mongoose**.
 
-### 🎁 Technologies used are: Node.js + GraphQL + Apollo Server + Express + Mongoose.
+**✨ Highlights:**
+- Ready-to-use server setup.
+- User registration and login functionalities.
+- Administrative role assignment for users.
+- Limitation on the number of registered users.
+- Secure storage of user data in MongoDB.
+- JWT-based authentication.
 
-**✨ These are some of the highlights:** 
+### 📝 Requirements
+- MongoDB 7.0+
+- Node.js 18.15+
 
-✅ A server ready to use!  
-✅ Users can login and registrate  
-✅ You can add the 'administration' rol to some users  
-✅ You can set a limit of users registered  
-✅ Users data is stored on a database  
-✅ The Auth validations are made with JWT  
+### 📚 Setup Instructions
+1. Clone and navigate to the directory.
+2. Install dependencies: `npm install` (or `npm install --production` for deployment).
+3. Duplicate `_env` as `.env` and configure it.
+4. Start the server: `npm start` (or `npm run dev` for development).
 
-### 📝 Backend Requirements
-* MongoDB 7.0 or higher
-* Node.js 18.15 or higher
+**.env Configuration Guide:**
+- `PORT`: Backend server port.
+- `ENVIRONMENT`: Node.js execution mode (`production` or `development`).
+- MongoDB connection settings (`MONGO_FORMAT_CONNECTION`, `MONGO_HOST`, etc.).
+- `SECRET`: JWT secret key (keep it secure).
+- `DURATION`: JWT token duration.
 
-### 📚 How to run the application?
-* Use the command: `npm install`. If you are deploying the app in production, it's better to use this command: `npm install --production`
-* Configure the application:
-  * Duplicate the configuration file `_env` and rename it as `.env`
-  * Edit the file `.env`
-* Then use: `npm run start`. 
-* That's it! That was fast enough, right? 🚀
+**Admin User Configuration:**
+Access the database to set a user's `isAdmin` field to `true`.
 
-**Do you need help with `.env` file?** 
+### 💻 Development Tools
+- Dev mode: `npm run dev`
+- Linter: `npm run lint`
+- Testing: `npm run test` / `npm run test:watch`
+- Clean logs: `npm run clean`
 
-Do not worry, I have written down some information for you. Here you have a guide:
+### API Reference
 
-| Key | Description |
-|-----|-------------|
-| PORT | The port for running the backend |
-| ENVIRONMENT | The mode of execution of Node.js. Choose between: production or development |
-| LIMIT_USERS_REGISTERED | Maximum number of users allowed to register. Set the value to 0 to not use the limit |
-| MONGO_FORMAT_CONNECTION | The format of connection with MongoDB service. Choose between: standard or DNSseedlist |
-| MONGO_HOST | Set this value only if you are using the standard connection format. Host of MongoDB service |
-| MONGO_PORT | Set this value only if you are using the standard connection format. Port of MongoDB service |
-| MONGO_DB | Set this value only if you are using the standard connection format. The name of database |
-| MONGO_USER | Set this value only if you are using the standard connection format. User name |
-| MONGO_PASS | Set this value only if you are using the standard connection format. User password |
-| MONGO_DNS_SEEDLIST_CONNECTION | Set this value only if you are using the DNSseedlist connection format. It should be something like this: mongodb+srv://user:password@uri-and-options |
-| SECRET | JWT secret key. Remember not to share this key for security reasons |
-| DURATION | JWT duration of auth token |
+**User Management:**
+- `registerUser`
+- `authUser`
+- `deleteMyUserAccount`
+- `updatePassword`
+- `updateIsActive`
 
-**❗️How can I configure a user to be an administrator?** 
+**Service Management:**
+- `createService`
+- `updateService`
+- `deleteService`
+- `listAllServices`
 
-To make a user an administrator you must access to the database and search its registry. You will see a Boolean who allows the user to have the role of the administrator. Set it to 'true' and in their next authentication that user will have administrator permissions.
+**Appointment Management:**
+- `createAppointment`
+- `updateAppointment`
+- `deleteAppointment`
+- `userAppointments`
+- `serviceAppointments`
+- `listAllAppointmentsShort`
+- `listAllAppointmentsFull`
 
-### 💻 Tricks for development
-* Run app in dev mode: `npm run dev`
-* Run the linter: `npm run lint`
-* Run the tests: `npm run test` or `npm run test:watch`
-* Delete all log files: `npm run clean`
+**GraphQL Types:**
+Detailed explanation of each type like `User`, `Service`, `Appointment`.
 
-### Would you like to contribute to this project?
-It would be great to receive your help. ♥️ 
+### Additional Information
+- Log management with `log4js`.
+- Environment configurations and global variables.
+- Detailed GraphQL schemas and resolvers in `backend/src/gql`.
+- Helper functions and utilities in `backend/src/helpers`.
 
-You can collaborate in multiple ways, of course. Let me give you some ideas:
-* Help me with this documentation. If you think something it's not clear, open an issue and talk to me!
-* Share this project, mark it as a favorite (⭐️) or make some suggestions
+---
+
+For more detailed information on resolver logic, refer to the `backend/src/gql/resolvers`. Helpers and utilities can be found in `backend/src/helpers`.
+
+# GraphQL API Backend Documentation
+
+## Overview
+This backend API, built with Node.js, GraphQL, Apollo Server, Express, and MongoDB, manages users, appointments, and services. It features user authentication, appointment scheduling, and service management.
+
+## Installation and Setup
+1. Clone the repository and navigate to the directory.
+2. Install dependencies: `npm install`
+3. Configure `.env` using `config/appConfig.js`.
+4. Start the server: `npm start` (production) or `npm run dev` (development).
+
+## API Endpoints
+
+### User Management
+- **Register User**: 
+  - Mutation: `registerUser`
+  - Example: 
+    ```graphql
+    mutation {
+      registerUser(email: "example@domain.com", password: "password123", userType: NORMAL_USER) {
+        token
+      }
+    }
+    ```
+
+- **Authenticate User**: 
+  - Mutation: `authUser`
+  - Example: 
+    ```graphql
+    mutation {
+      authUser(email: "example@domain.com", password: "password123") {
+        token
+      }
+    }
+    ```
+
+### Appointment Management
+- **Create Appointment**: 
+  - Mutation: `createAppointment`
+  - Example: 
+    ```graphql
+    mutation {
+      createAppointment(userId: "userID", serviceId: "serviceID", date: "2023-04-01T09:00:00.000Z") {
+        uuid
+      }
+    }
+    ```
+
+- **Update Appointment**: 
+  - Mutation: `updateAppointment`
+  - Example: 
+    ```graphql
+    mutation {
+      updateAppointment(uuid: "appointmentID", newDate: "2023-05-01T09:00:00.000Z", newStatus: "confirmed") {
+        uuid
+      }
+    }
+    ```
+
+- **Delete Appointment**: 
+  - Mutation: `deleteAppointment`
+  - Example: 
+    ```graphql
+    mutation {
+      deleteAppointment(uuid: "appointmentID") {
+        success
+        message
+      }
+    }
+    ```
+
+### Service Management
+- **Create Service**: 
+  - Mutation: `createService`
+  - Example: 
+    ```graphql
+    mutation {
+      createService(name: "Service Name", category: "Service Category") {
+        serviceId
+      }
+    }
+    ```
+
+- **Update Service**: 
+  - Mutation: `updateService`
+  - Example: 
+    ```graphql
+    mutation {
+      updateService(serviceId: "serviceID", name: "New Service Name", category: "New Category") {
+        serviceId
+      }
+    }
+    ```
+
+- **Delete Service**: 
+  - Mutation: `deleteService`
+  - Example: 
+    ```graphql
+    mutation {
+      deleteService(serviceId: "serviceID") {
+        success
+        message
+      }
+    }
+    ```
+
+## Additional Information
+- Logging is managed using `log4js`, with logs stored in `/logs`.
+- Environment configurations and GraphQL schemas are detailed in respective directories.
+- For more details on resolvers, check `backend/src/gql/resolvers`.
+- Helper functions can be found in `backend/src/helpers`.
