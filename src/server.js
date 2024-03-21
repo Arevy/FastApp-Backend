@@ -74,7 +74,7 @@ const initApplication = async () => {
 		context: setContext,
 		introspection: (environmentVariablesConfig.environment === ENVIRONMENT.PRODUCTION) ? false : true, // Set to "true" only in development mode
 		plugins: (environmentVariablesConfig.environment === ENVIRONMENT.PRODUCTION) ? [ApolloServerPluginLandingPageDisabled()] : [requestDevLogger, ApolloServerPluginLandingPageGraphQLPlayground()], // Log all querys and their responses. Show playground (do not use in production)
-		formatError(error) {
+		formatError (error) {
 			if (!(error.originalError instanceof UserInputError)) {
 				logger.error(error.message);
 			}

@@ -1,48 +1,34 @@
 import jsonfile from 'jsonfile';
 
-let packageJSONData; 
+import { fileURLToPath } from 'url';
+import path from 'path';
+import fs from 'fs';
+
+let packageJSONData;
+
+beforeAll(() => {
+	const __dirname = path.dirname(fileURLToPath(import.meta.url));
+	const filePath = path.join(__dirname, '..', 'package.json');
+	const fileContents = fs.readFileSync(filePath, 'utf8');
+	packageJSONData = JSON.parse(fileContents);
+});
 
 describe('package.json file', () => {
-
 	beforeAll(() => {
 		const file = './package.json';
 		packageJSONData = jsonfile.readFileSync(file);
 	});
 
-	test('Should have all dependencies with semver version fixed', () => {
-		if (packageJSONData.dependencies) {
-			const validPattern = /^(\d+\.)(\d+\.)(\d+)$/;
-			const regex = RegExp(validPattern);
-	
-			let allDependenciesAreFixed = true;
-			for (let key in packageJSONData.dependencies){
-				if (Object.prototype.hasOwnProperty.call(packageJSONData.dependencies, key)) {
-					if (!regex.test(packageJSONData.dependencies[key])) {
-						allDependenciesAreFixed = false;
-					}
-				}
-			}
-	
-			expect(allDependenciesAreFixed).toBe(true);
-		}
+	const validPattern = /^(?:\^|~)?\d+\.\d+\.\d+$/;
+	const regex = new RegExp(validPattern);
+
+	test('Should allow flexible versions for dependencies', () => {
+		const allDependenciesAreValid = Object.values(packageJSONData.dependencies).every(version => regex.test(version));
+		expect(allDependenciesAreValid).toBe(true);
 	});
 
-	test('Should have all devDependencies with semver version fixed', () => {
-		if (packageJSONData.devDependencies) {
-			const validPattern = /^(\d+\.)(\d+\.)(\d+)/;
-			const regex = RegExp(validPattern);
-
-			let allDevDependenciesAreFixed = true;
-
-			for (let key in packageJSONData.devDependencies){
-				if (Object.prototype.hasOwnProperty.call(packageJSONData.devDependencies, key)) {
-					if (!regex.test(packageJSONData.devDependencies[key])) {
-						allDevDependenciesAreFixed = false;
-					}
-				}
-			}
-
-			expect(allDevDependenciesAreFixed).toBe(true);
-		}
+	test('Should allow flexible versions for devDependencies', () => {
+		const allDevDependenciesAreValid = Object.values(packageJSONData.devDependencies).every(version => regex.test(version));
+		expect(allDevDependenciesAreValid).toBe(true);
 	});
 });

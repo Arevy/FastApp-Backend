@@ -27,6 +27,7 @@
   "author": "Dídac García (https://didaquis.github.io/)",
   "license": "MIT",
   "devDependencies": {
+    "@babel/preset-env": "^7.24.3",
     "@didaquis/eslint-plugin-no-lenght": "1.1.2",
     "eslint": "8.37.0",
     "husky": "8.0.3",

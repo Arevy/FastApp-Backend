@@ -7,7 +7,7 @@ import { isValidEmail, isStrongPassword } from '../../helpers/validations.js';
 export default {
 	Query: {
 		usersByType: async (_, { userType }, context) => {
-			return await context.di.model.Users.find({ userType });
+			return context.di.model.Users.find({ userType });
 		},
 	},
 	Mutation: {
@@ -55,9 +55,9 @@ export default {
 			const updateResult = await context.di.model.Users.findOneAndUpdate({ uuid }, { password: hashedPassword }, { new: true }).lean();
 
 			if (updateResult.password === hashedPassword) {
-				return { success: true, message: "Password successfully updated." };
+				return { success: true, message: 'Password successfully updated.' };
 			} else {
-				return { success: false, message: "Password update failed." };
+				return { success: false, message: 'Password update failed.' };
 			}
 		},
 
@@ -65,9 +65,9 @@ export default {
 			const updateResult = await context.di.model.Users.findOneAndUpdate({ uuid }, { isActive: newIsActive }, { new: true }).lean();
 
 			if (updateResult.isActive === newIsActive) {
-				return { success: true, message: "isActive status successfully updated." };
+				return { success: true, message: 'isActive status successfully updated.' };
 			} else {
-				return { success: false, message: "isActive status update failed." };
+				return { success: false, message: 'isActive status update failed.' };
 			}
 		},
 		/**
@@ -107,7 +107,7 @@ export default {
 			if (!user) {
 				return {
 					success: false,
-					message: "User not found."
+					message: 'User not found.'
 				};
 			}
 			const deleteUserResult = await context.di.model.Users.deleteOne({ uuid: user.uuid });
@@ -115,12 +115,12 @@ export default {
 			if (deleteUserResult.deletedCount === 1) {
 				return {
 					success: true,
-					message: "User successfully deleted."
+					message: 'User successfully deleted.'
 				};
 			} else {
 				return {
 					success: false,
-					message: "User deletion failed."
+					message: 'User deletion failed.'
 				};
 			}
 		}

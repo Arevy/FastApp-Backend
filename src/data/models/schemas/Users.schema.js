@@ -12,7 +12,7 @@ const Schema = mongoose.Schema;
 const UsersSchema = new Schema({
 	userType: {
 		type: String,
-		enum: ["NORMAL_USER", "SERVICE_USER", "ADMIN_USER"],
+		enum: ['NORMAL_USER', 'SERVICE_USER', 'ADMIN_USER'],
 		required: true
 	},
 	email: {
