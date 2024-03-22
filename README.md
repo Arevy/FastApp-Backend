@@ -87,6 +87,9 @@ This backend API, built with Node.js, GraphQL, Apollo Server, Express, and Mongo
 3. Configure `.env` using `config/appConfig.js`.
 4. Start the server: `npm start` (production) or `npm run dev` (development).
 
+
+## Fix format eslint
+-  `eslint --ext .js . "--fix"`
 ## API Endpoints
 
 ### User Management

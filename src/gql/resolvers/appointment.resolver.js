@@ -121,29 +121,56 @@ export default {
 			return data;
 		},
 		updateAppointment: async (_, { uuid, newDate, newStatus }, context) => {
-			// Update an appointment using the Appointment model from context
 			const updateAppointmentData = {};
 			if (newDate) {
-				updateAppointmentData.date = newDate;
+				const dateObject = new Date(newDate);
+				if (isNaN(dateObject.getTime())) {
+					throw new Error('Invalid date format');
+				}
+				updateAppointmentData.date = dateObject;
 			}
+
 			if (newStatus) {
 				updateAppointmentData.status = newStatus;
 			}
-			return context.di.model.Appointment.findByIdAndUpdate(
-				uuid,
-				updateAppointmentData,
-				{ new: true }
-			);
-		},
-		deleteAppointment: async (_, { uuid }, context) => {
-			// Delete an appointment using the Appointment model from context
-			const result = await context.di.model.Appointment.deleteOne({
-				_id: uuid,
-			});
+
+			const updatedAppointment = await context.di.model.Appointment.findOneAndUpdate({ uuid }, updateAppointmentData, { new: true });
+			if (!updatedAppointment) {
+				throw new Error('Appointment not found');
+			}
+
+			console.log('Updated appointment:', updatedAppointment);
+
 			return {
-				success: result.deletedCount === 1,
-				message: result.deletedCount === 1 ? 'Appointment deleted successfully' : 'Error deleting appointment',
+				uuid: updatedAppointment.uuid,
+				date: updatedAppointment.date.toISOString(),
+				status: updatedAppointment.status,
 			};
+		},
+
+		deleteAppointment: async (_, { uuid }, context) => {
+			try {
+				const result = await context.di.model.Appointment.findOneAndDelete({
+					uuid,
+				});
+				if (result) {
+					return {
+						success: true,
+						message: 'Appointment deleted successfully',
+					};
+				} else {
+					return {
+						success: false,
+						message: 'Appointment not found',
+					};
+				}
+			} catch (error) {
+				console.error(error);
+				return {
+					success: false,
+					message: 'An error occurred while trying to delete the appointment',
+				};
+			}
 		},
 	},
 	// ... other resolvers ...
