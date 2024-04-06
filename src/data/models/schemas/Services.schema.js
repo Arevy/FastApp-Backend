@@ -6,7 +6,7 @@ const Schema = mongoose.Schema;
 const ServicesSchema = new Schema({
 	serviceId: {
 		type: String,
-		required: false,
+		required: true,
 		unique: true,
 	},
 	name: {
