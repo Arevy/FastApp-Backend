@@ -73,9 +73,9 @@ export default {
 		deleteService: async (_, { serviceId }, context) => {
 			const result = await context.di.model.Service.deleteOne({ serviceId });
 			return {
-			  success: result.deletedCount === 1,
-			  message: result.deletedCount === 1 ? 'Service deleted successfully' : 'Error deleting service',
+				success: result.deletedCount === 1,
+				message: result.deletedCount === 1 ? 'Service deleted successfully' : 'Error deleting service',
 			};
-		  },
+		},
 	},
 };

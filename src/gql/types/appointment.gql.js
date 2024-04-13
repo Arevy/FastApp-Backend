@@ -38,7 +38,7 @@ export default /* GraphQL */ gql`
     }
     
     type Service{
-        serviceId: ID!
+        serviceId: ID
         name: String
         category: String
     } 
