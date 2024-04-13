@@ -17,5 +17,28 @@ export default {
 		}
 	},
 	Mutation: {
+		updateUserAdminStatus: async (_, { uuid, isAdmin, isActive, userType }, context) => {
+			const updateData = {};
+			if (isAdmin !== undefined) {
+				updateData.isAdmin = isAdmin;
+			}
+			if (isActive !== undefined) {
+				updateData.isActive = isActive;
+			}
+			if (userType) {
+				updateData.userType = userType;
+			}
+	
+			const updateResult = await context.di.model.Users.findOneAndUpdate(
+				{ uuid },
+				updateData,
+				{ new: true }
+			).lean();
+	
+			if (!updateResult) {
+				return { success: false, message: 'User update failed or user not found.' };
+			}
+			return { success: true, message: 'User updated successfully.' };
+		},
 	}
 };

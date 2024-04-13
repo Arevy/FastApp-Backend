@@ -22,4 +22,8 @@ export default /* GraphQL */ gql`
 		""" Get list of all users registered on database """
 		listAllUsers: [User]
 	}
+
+	type Mutation {
+		updateUserAdminStatus(uuid: ID!, isAdmin: Boolean, isActive: Boolean, userType: UserType): UpdateResult
+	}
 `;
