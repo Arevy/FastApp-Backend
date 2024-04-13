@@ -35,8 +35,12 @@ export default {
 		},
 
 		listAllServices: async (_, args, context) => {
-			// return await context.di.model.Service.find({});
-			return context.di.model.Service.find().sort().lean();
+			try {
+				return await context.di.model.Service.find({}).select('+isActive').lean(); // Folosește `.select()` dacă `isActive` este setat să nu fie returnat implicit
+			} catch (error) {
+				console.error('Error retrieving services:', error);
+				throw new Error('Failed to retrieve services');
+			}
 		},
 	},
 	Mutation: {
@@ -69,6 +73,20 @@ export default {
 				updateData,
 				{ new: true }
 			);
+		},
+		toggleServiceActive: async (_, { serviceId }, context) => {
+			try {
+				const service = await context.di.model.Service.findOne({ serviceId: serviceId });
+				if (!service) {
+					throw new Error('Service not found');
+				}
+				service.isActive = !service.isActive;
+				await service.save();
+				return service;
+			} catch (error) {
+				console.error('Error toggling service active status', error);
+				throw new Error('Failed to toggle service active status');
+			}
 		},
 		deleteService: async (_, { serviceId }, context) => {
 			const result = await context.di.model.Service.deleteOne({ serviceId });
