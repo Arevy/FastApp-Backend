@@ -44,20 +44,22 @@ export default {
 		},
 	},
 	Mutation: {
-		createService: async (_, { name, category }, context) => {
-			const serviceId = uuidv4(); // Generate a unique serviceId
-			await new context.di.model.Service({ serviceId, name, category }).save();
-			const savedService = await context.di.model.Service.findOne({
-				name,
-			}).lean();
-
-			return savedService
-				? {
-					serviceId: savedService?._id.toString() || '1',
-					name: savedService?.name || 'nope_name',
-					category: savedService?.category || 'nope_category',
-				}
-				: null;
+		createService: async (_, { name, category, isActive }, context) => {
+			try {
+				const serviceId = uuidv4();
+				const newService = new context.di.model.Service({
+					serviceId,
+					name,
+					category,
+					isActive
+				});
+				await newService.save();  
+	
+				return newService;  
+			} catch (error) {
+				console.error('Error creating service:', error);
+				throw new Error('Failed to create service');
+			}
 		},
 		updateService: async (_, { serviceId, name, category }, context) => {
 			const updateData = {};

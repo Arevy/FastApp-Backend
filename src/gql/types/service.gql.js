@@ -9,7 +9,7 @@ export default /* GraphQL */ gql`
     }
 
     type Mutation {
-        createService(name: String, category: String): ServiceType
+        createService(name: String, category: String, isActive: Boolean!): ServiceType
         updateService(serviceId: ID!, name: String, category: String): ServiceType
         toggleServiceActive(serviceId: ID!): ServiceType
         deleteService(serviceId: ID!): DeleteResult
