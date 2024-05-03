@@ -7,11 +7,15 @@ import { securityVariablesConfig } from '../../config/appConfig.js';
  * @param {string}	email		- User email
  * @param {boolean}	isAdmin		- If user is admin or not
  * @param {boolean}	isActive	- If user is active or not
- * @param {string}	uuid		- An uuid token
+ * @param {string}	_id		    - An _id token
  * @returns	{string}			- Json Web Token
  */
-export const createAuthToken = (email, isAdmin, isActive, uuid) => {
-	return jwt.sign({ email, isAdmin, isActive, uuid }, securityVariablesConfig.secret, { expiresIn: securityVariablesConfig.timeExpiration });
+export const createAuthToken = (email, isAdmin, isActive, _id) => {
+	return jwt.sign(
+		{ email, isAdmin, isActive, _id }, 
+		securityVariablesConfig.secret,
+		{ expiresIn: securityVariablesConfig.timeExpiration }
+	);
 };
 
 /**

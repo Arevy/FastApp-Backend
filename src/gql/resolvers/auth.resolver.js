@@ -3,7 +3,6 @@ import bcrypt from 'bcrypt';
 
 import { isValidEmail, isStrongPassword } from '../../helpers/validations.js';
 
-
 export default {
 	Query: {
 		usersByType: async (_, { userType }, context) => {
@@ -12,8 +11,8 @@ export default {
 	},
 	Mutation: {
 		/**
-		 * It allows to users to register as long as the limit of allowed users has not been reached
-		 */
+     * It allows to users to register as long as the limit of allowed users has not been reached
+     */
 		registerUser: async (parent, { email, password, userType }, context) => {
 			if (!email || !password || !userType) {
 				throw new UserInputError('Data provided is not valid');
@@ -29,9 +28,13 @@ export default {
 
 			const registeredUsersCount = await context.di.model.Users.find().estimatedDocumentCount();
 
-			context.di.authValidation.ensureLimitOfUsersIsNotReached(registeredUsersCount);
+			context.di.authValidation.ensureLimitOfUsersIsNotReached(
+				registeredUsersCount
+			);
 
-			const isAnEmailAlreadyRegistered = await context.di.model.Users.findOne({ email }).lean();
+			const isAnEmailAlreadyRegistered = await context.di.model.Users.findOne({
+				email,
+			}).lean();
 
 			if (isAnEmailAlreadyRegistered) {
 				throw new UserInputError('Data provided is not valid');
@@ -42,64 +45,84 @@ export default {
 			const user = await context.di.model.Users.findOne({ email }).lean();
 
 			return {
-				token: context.di.jwt.createAuthToken(user.email, user.isAdmin, user.isActive, user.uuid)
+				token: context.di.jwt.createAuthToken(
+					user.email,
+					user.isAdmin,
+					user.isActive,
+					user._id
+				),
 			};
 		},
 
-		updatePassword: async (_, { uuid, newPassword }, context) => {
-			// if (!isStrongPassword(newPassword)) {
-			// 	throw new UserInputError('The new password is not secure enough');
-			// }
-
+		updatePassword: async (_, { _id, newPassword }, context) => {
 			const hashedPassword = await bcrypt.hash(newPassword, 10);
-			const updateResult = await context.di.model.Users.findOneAndUpdate({ uuid }, { password: hashedPassword }, { new: true }).lean();
+			const updateResult = await context.di.model.Users.findByIdAndUpdate(
+				_id,
+				{ password: hashedPassword },
+				{ new: true }
+			).lean();
 
-			if (updateResult.password === hashedPassword) {
+			if (updateResult && updateResult.password === hashedPassword) {
 				return { success: true, message: 'Password successfully updated.' };
 			} else {
 				return { success: false, message: 'Password update failed.' };
 			}
 		},
 
-		updateIsActive: async (_, { uuid, newIsActive }, context) => {
-			const updateResult = await context.di.model.Users.findOneAndUpdate({ uuid }, { isActive: newIsActive }, { new: true }).lean();
+		updateIsActive: async (_, { _id, newIsActive }, context) => {
+			const updateResult = await context.di.model.Users.findByIdAndUpdate(
+				_id,
+				{ isActive: newIsActive },
+				{ new: true }
+			).lean();
 
-			if (updateResult.isActive === newIsActive) {
-				return { success: true, message: 'isActive status successfully updated.' };
-			} else {
-				return { success: false, message: 'isActive status update failed.' };
-			}
+			return {
+				success: updateResult ? true : false,
+				message: updateResult
+					? 'isActive status successfully updated.'
+					: 'isActive status update failed.',
+			};
 		},
 		/**
-		 * It allows users to authenticate. Users with property isActive with value false are not allowed to authenticate. When an user authenticates the value of lastLogin will be updated
-		 */
+     * It allows users to authenticate. Users with property isActive with value false are not allowed to authenticate. When an user authenticates the value of lastLogin will be updated
+     */
 		authUser: async (parent, { email, password }, context) => {
 			if (!email || !password) {
 				throw new UserInputError('Invalid credentials');
 			}
 
-			const user = await context.di.model.Users.findOne({ email, isActive: true }).lean();
-
+			const user = await context.di.model.Users.findOne({
+				email,
+				isActive: true,
+			}).lean();
 			if (!user) {
 				throw new UserInputError('User not found or login not allowed');
 			}
-			/** Verify pass - uncomment me please
-			const isCorrectPassword = await bcrypt.compare(password, user.password);
 
-			
+			const isCorrectPassword = await bcrypt.compare(password, user.password);
 			if (!isCorrectPassword) {
 				throw new UserInputError('Invalid credentials');
 			}
-			 */
-			await context.di.model.Users.findOneAndUpdate({ email }, { lastLogin: new Date().toISOString() }, { new: true }).lean();
+
+			await context.di.model.Users.findByIdAndUpdate(
+				user._id, // Folosește _id pentru a actualiza lastLogin
+				{ lastLogin: new Date().toISOString() },
+				{ new: true }
+			).lean();
 
 			return {
-				token: context.di.jwt.createAuthToken(user.email, user.isAdmin, user.isActive, user.uuid)
+				token: context.di.jwt.createAuthToken(
+					user.email,
+					user.isAdmin,
+					user.isActive,
+					user._id // Folosește _id pentru a crea token-ul
+				),
 			};
 		},
+
 		/**
-		 * It allows to user to delete their account permanently (this action does not delete the records associated with the user, it only deletes their user account)
-		 */
+     * It allows to user to delete their account permanently (this action does not delete the records associated with the user, it only deletes their user account)
+     */
 		deleteMyUserAccount: async (parent, args, context) => {
 			context.di.authValidation.ensureThatUserIsLogged(context);
 
@@ -107,22 +130,24 @@ export default {
 			if (!user) {
 				return {
 					success: false,
-					message: 'User not found.'
+					message: 'User not found.',
 				};
 			}
-			const deleteUserResult = await context.di.model.Users.deleteOne({ uuid: user.uuid });
 
-			if (deleteUserResult.deletedCount === 1) {
+			const deleteUserResult = await context.di.model.Users.findByIdAndDelete(
+				user._id
+			);
+			if (deleteUserResult) {
 				return {
 					success: true,
-					message: 'User successfully deleted.'
+					message: 'User successfully deleted.',
 				};
 			} else {
 				return {
 					success: false,
-					message: 'User deletion failed.'
+					message: 'User deletion failed.',
 				};
 			}
-		}
-	}
+		},
+	},
 };
