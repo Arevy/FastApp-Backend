@@ -1,23 +1,22 @@
-import { v4 as uuidv4 } from 'uuid';
 // import { logger, endLogger } from './helpers/logger.js';
 
 /**
  * All resolvers related to services
  * @typedef {Object}
  */
+
+const cache = {};
 export default {
 	Query: {
-		// ... existing resolvers ...
-
 		serviceAppointments: async (_, { serviceId }, context) => {
-			// Ensure the user has the right to view these appointments
-			await context.di.authValidation.ensureUserCanViewServiceAppointments(
-				context,
-				serviceId
-			);
-
-			// If validation passes, list the appointments
-			return context.di.model.Appointment.find({ serviceId });
+			if (cache[serviceId]) {
+				return cache[serviceId]; // Return cached data if available
+			}
+			const appointments = await context.di.model.Appointment.find({
+				serviceId,
+			}).lean();
+			cache[serviceId] = appointments; // Cache the data for future requests
+			return appointments;
 		},
 
 		allAppointments: async (_, args, context) => {
@@ -35,46 +34,59 @@ export default {
 		},
 
 		listAllServices: async (_, args, context) => {
-			// return await context.di.model.Service.find({});
-			return context.di.model.Service.find().sort().lean();
+			try {
+				return await context.di.model.Service.find({})
+					.select('+isActive')
+					.lean(); // Use `.select()` if `isActive` is set to not return by default
+			} catch (error) {
+				console.error('Error retrieving services:', error);
+				throw new Error('Failed to retrieve services');
+			}
 		},
 	},
+
 	Mutation: {
-		createService: async (_, { name, category }, context) => {
-			const serviceId = uuidv4(); // Generate a unique serviceId
-			await new context.di.model.Service({ serviceId, name, category }).save();
-			const savedService = await context.di.model.Service.findOne({
+		createService: async (_, { name, category, isActive }, context) => {
+			const newService = new context.di.model.Service({
 				name,
-			}).lean();
-
-			return savedService
-				? {
-					serviceId: savedService?._id.toString() || '1',
-					name: savedService?.name || 'nope_name',
-					category: savedService?.category || 'nope_category',
-				}
-				: null;
+				category,
+				isActive,
+			});
+			await newService.save();
+			return newService;
 		},
-		updateService: async (_, { serviceId, name, category }, context) => {
-			const updateData = {};
-			if (name) {
-				updateData.name = name;
-			}
-			if (category) {
-				updateData.category = category;
-			}
 
-			return context.di.model.Service.findByIdAndUpdate(
-				serviceId,
-				updateData,
+		updateService: async (_, { _id, name, category }, context) => {
+			const updateData = { name, category };
+			const updatedService = await context.di.model.Service.findByIdAndUpdate(
+				_id,
+				{ $set: updateData },
 				{ new: true }
 			);
+			if (!updatedService) {
+				throw new Error('Service not found or update failed');
+			}
+			return updatedService;
 		},
-		deleteService: async (_, { serviceId }, context) => {
-			const result = await context.di.model.Service.deleteOne({ serviceId });
+
+		toggleServiceActive: async (_, { _id }, context) => {
+			const service = await context.di.model.Service.findById(_id);
+			if (!service) {
+				throw new Error('Service not found');
+			}
+			service.isActive = !service.isActive;
+			await service.save();
+			return service;
+		},
+
+		deleteService: async (_, { _id }, context) => {
+			const result = await context.di.model.Service.findByIdAndDelete(_id);
+			if (!result) {
+				throw new Error('Service not found or delete failed');
+			}
 			return {
-				success: result.deletedCount === 1,
-				message: result.deletedCount === 1 ? 'Service deleted successfully' : 'Error deleting service',
+				success: true,
+				message: 'Service deleted successfully',
 			};
 		},
 	},
