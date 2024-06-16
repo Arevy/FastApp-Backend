@@ -12,6 +12,7 @@ export default /* GraphQL */ gql`
     email: String!
     isAdmin: Boolean
     isActive: Boolean
+    userName: String!
     registrationDate: String!
     lastLogin: String
     userType: UserType!

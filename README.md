@@ -124,6 +124,7 @@ This backend API, built with Node.js, GraphQL, Apollo Server, Express, and Mongo
         email: "example@domain.com"
         password: "password123"
         userType: NORMAL_USER
+        userName: "userName1"
       ) {
         token
       }
@@ -252,17 +253,17 @@ This section provides the input variables required to replicate the current data
 
 ````graphql
 mutation {
-  registerUser(email: "user@example.com", password: "VerySecure123!", userType: NORMAL_USER) {
+  registerUser(email: "user@example.com", password: "VerySecure123!", userType: NORMAL_USER, userName: "userName1") {
     token
   }
 }
 mutation {
-  registerUser(email: "sdadd@dsds.dd", password: "SecurePass!", userType: SERVICE_USER) {
+  registerUser(email: "sdadd@dsds.dd", password: "SecurePass!", userType: SERVICE_USER, userName: "userName2") {
     token
   }
 }
 mutation {
-  registerUser(email: "abcb@aa.aaa", password: "AnotherPass123!", userType: ADMIN_USER) {
+  registerUser(email: "abcb@aa.aaa", password: "AnotherPass123!", userType: ADMIN_USER, userName: "userName3") {
     token
   }
 }

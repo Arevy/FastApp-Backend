@@ -13,8 +13,8 @@ export default {
 		/**
      * It allows to users to register as long as the limit of allowed users has not been reached
      */
-		registerUser: async (parent, { email, password, userType }, context) => {
-			if (!email || !password || !userType) {
+		registerUser: async (parent, { email, password, userType, userName }, context) => {
+			if (!email || !password || !userType || !userName) {
 				throw new UserInputError('Data provided is not valid');
 			}
 
@@ -40,7 +40,7 @@ export default {
 				throw new UserInputError('Data provided is not valid');
 			}
 
-			await new context.di.model.Users({ email, password, userType }).save();
+			await new context.di.model.Users({ email, password, userType, userName }).save();
 
 			const user = await context.di.model.Users.findOne({ email }).lean();
 
@@ -49,6 +49,7 @@ export default {
 					user.email,
 					user.isAdmin,
 					user.isActive,
+					user.userName
 				),
 			};
 		},
@@ -106,7 +107,7 @@ export default {
 			await context.di.model.Users.findByIdAndUpdate(
 				user._id, 
 				{ lastLogin: new Date().toISOString() },
-				{ new: true }
+				{ new: false }
 			).lean();
 
 			return {
@@ -114,6 +115,7 @@ export default {
 					user.email,
 					user.isAdmin,
 					user.isActive,
+					user.userName
 				),
 				user: user
 			};

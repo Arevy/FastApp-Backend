@@ -30,7 +30,7 @@ export default /* GraphQL */ gql`
     """
     It allows users to register
     """
-    registerUser(email: String!, password: String!, userType: UserType!): Token
+    registerUser(email: String!, password: String!, userType: UserType!, userName: String!): Token
 
     """
     It allows users to authenticate
