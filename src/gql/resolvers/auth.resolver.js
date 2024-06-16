@@ -22,9 +22,9 @@ export default {
 				throw new UserInputError('The email is not valid');
 			}
 
-			// if (!isStrongPassword(password)) {
-			// 	throw new UserInputError('The password is not secure enough');
-			// }
+			if (!isStrongPassword(password)) {
+				throw new UserInputError('The password is not secure enough');
+			}
 
 			const registeredUsersCount = await context.di.model.Users.find().estimatedDocumentCount();
 
@@ -49,7 +49,6 @@ export default {
 					user.email,
 					user.isAdmin,
 					user.isActive,
-					user._id
 				),
 			};
 		},
@@ -105,7 +104,7 @@ export default {
 			}
 
 			await context.di.model.Users.findByIdAndUpdate(
-				user._id, // Folosește _id pentru a actualiza lastLogin
+				user._id, 
 				{ lastLogin: new Date().toISOString() },
 				{ new: true }
 			).lean();
@@ -115,8 +114,8 @@ export default {
 					user.email,
 					user.isAdmin,
 					user.isActive,
-					user._id // Folosește _id pentru a crea token-ul
 				),
+				user: user
 			};
 		},
 
@@ -135,7 +134,7 @@ export default {
 			}
 
 			const deleteUserResult = await context.di.model.Users.findByIdAndDelete(
-				user._id
+				user.email
 			);
 			if (deleteUserResult) {
 				return {

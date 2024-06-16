@@ -9,6 +9,7 @@ export default /* GraphQL */ gql`
 
   type Token {
     token: String
+    user: User
   }
 
   type Query {

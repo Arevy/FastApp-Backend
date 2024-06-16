@@ -28,7 +28,7 @@ export default /* GraphQL */ gql`
   }
 
   type User {
-    uuid: ID!
+    # uuid: ID!
     email: String!
   }
 
