@@ -2,7 +2,7 @@ import { gql } from 'apollo-server-express';
 
 export default /* GraphQL */ gql`
   type Mutation {
-    createAppointment(userId: ID!, serviceId: ID!, date: String!): Appointment
+    createAppointment(userId: ID!, serviceId: ID!, date: String!, status: String!): Appointment
     updateAppointment(_id: ID!, newDate: String, newStatus: String): Appointment
     deleteAppointment(_id: ID!): DeleteResult
   }
