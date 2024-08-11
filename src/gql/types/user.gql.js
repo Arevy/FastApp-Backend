@@ -1,6 +1,6 @@
 import { gql } from 'apollo-server-express';
 
-export default /* GraphQL */ gql`
+export default gql`
   enum UserType {
     NORMAL_USER
     SERVICE_USER
@@ -24,11 +24,24 @@ export default /* GraphQL */ gql`
   }
 
   type Mutation {
+    createUser(
+      email: String!
+      userName: String!
+      password: String!
+      userType: UserType!
+      isActive: Boolean!
+    ): User
+
     updateUserAdminStatus(
       _id: ID!
       isAdmin: Boolean
       isActive: Boolean
       userType: UserType
     ): UpdateResult
+  }
+
+  type UpdateResult {
+    success: Boolean!
+    message: String
   }
 `;

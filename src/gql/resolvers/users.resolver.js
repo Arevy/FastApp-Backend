@@ -17,6 +17,24 @@ export default {
 		},
 	},
 	Mutation: {
+		createUser: async (_, { email, userName, password, userType, isActive }, context) => {
+			try {
+				const newUser = new context.di.model.Users({
+					email,
+					userName,
+					password,
+					userType,
+					isActive,
+					isAdmin: userType === 'ADMIN_USER',
+				});
+				await newUser.save();
+				return newUser;
+			} catch (error){
+				console.error('Error creating user:', error);
+				throw new Error('Failed to create user');
+			}
+		},
+
 		updateUserAdminStatus: async (
 			_,
 			{ _id, isAdmin, isActive, userType },
