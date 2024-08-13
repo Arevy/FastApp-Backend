@@ -51,6 +51,13 @@ export default {
 					user.isActive,
 					user.userName
 				),
+				user: {
+					_id: user._id,
+					email: user.email,
+					isAdmin: user.isAdmin,
+					isActive: user.isActive,
+					userName: user.userName
+				}
 			};
 		},
 
