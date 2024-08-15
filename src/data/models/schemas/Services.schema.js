@@ -17,6 +17,14 @@ const ServicesSchema = new Schema(
 			required: true,
 			default: true,
 		},
+		description: {
+			type: String,
+			required: false,
+		},
+		imageUrl: {
+			type: String,
+			required: false,
+		},
 	},
 	{ timestamps: true }
 );
