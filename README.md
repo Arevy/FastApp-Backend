@@ -244,6 +244,60 @@ This backend API, built with Node.js, GraphQL, Apollo Server, Express, and Mongo
       }
     }
     ```
+- **Create Service with optional details**:
+
+  - Mutation: `createService`
+
+    - Example:
+
+      ```graphql
+      mutation {
+        createService(
+          name: "Service Name"
+          category: "Service Category"
+          isActive: true
+          description: "Detailed description of the service"
+          imageBase64: "base64encodedimage"
+          imageContentType: "image/png"
+        ) {
+          _id
+          name
+          category
+          isActive
+          description
+          imageBase64
+          imageContentType
+        }
+      }
+      ```
+
+      #### Update Service
+
+- **Update Service with optional details**:
+
+  - Mutation: `updateService`
+  - Example:
+    ```graphql
+    mutation {
+      updateService(
+        _id: "serviceID"
+        name: "Updated Service Name"
+        category: "Updated Category"
+        isActive: true
+        description: "Updated detailed description of the service"
+        imageBase64: "updatedBase64encodedimage"
+        imageContentType: "image/jpeg"
+      ) {
+        _id
+        name
+        category
+        isActive
+        description
+        imageBase64
+        imageContentType
+      }
+    }
+    ```
 
 ## Additional Information
 
@@ -374,6 +428,106 @@ mutation {
     isActive
   }
 }
+
+### Service Management with optional details
+
+- **Create Service with optional details**:
+
+  - Mutation: `createService`
+  - Example:
+    ```graphql
+    mutation {
+      createService(
+        name: "Luxury Spa Package",
+        category: "Health & Wellness",
+        isActive: true,
+        description: "A full day luxury spa experience with a variety of treatments to relax and rejuvenate.",
+        imageBase64: "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABGklEQVR42mNkQA...",
+        imageContentType: "image/png"
+      ) {
+        _id
+        name
+        category
+        isActive
+        description
+        imageBase64
+        imageContentType
+      }
+    }
+    ```
+
+  - Another Example:
+    ```graphql
+    mutation {
+      createService(
+        name: "Therapeutic Massage",
+        category: "Massage Therapy",
+        isActive: true,
+        description: "Deep tissue massage to relieve chronic muscle tension and improve circulation.",
+        imageBase64: "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABGklEQVR42mNkQA...",
+        imageContentType: "image/jpeg"
+      ) {
+        _id
+        name
+        category
+        isActive
+        description
+        imageBase64
+        imageContentType
+      }
+    }
+    ```
+
+#### Update Service
+
+- **Update Service**:
+
+  - Mutation: `updateService`
+  - Example:
+    ```graphql
+    mutation {
+      updateService(
+        _id: "serviceID",
+        name: "Updated Luxury Spa Package",
+        category: "Health & Wellness",
+        isActive: true,
+        description: "Updated description: A luxurious spa day with additional aromatherapy treatments.",
+        imageBase64: "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABGklEQVR42mNkQA...",
+        imageContentType: "image/png"
+      ) {
+        _id
+        name
+        category
+        isActive
+        description
+        imageBase64
+        imageContentType
+      }
+    }
+    ```
+
+  - Another Example:
+    ```graphql
+    mutation {
+      updateService(
+        _id: "anotherServiceID",
+        name: "Updated Therapeutic Massage",
+        category: "Massage Therapy",
+        isActive: true,
+        description: "Updated description: Enhanced deep tissue massage with essential oils for better relaxation.",
+        imageBase64: "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABGklEQVR42mNkQA...",
+        imageContentType: "image/jpeg"
+      ) {
+        _id
+        name
+        category
+        isActive
+        description
+        imageBase64
+        imageContentType
+      }
+    }
+    ```
 
 ### Additional Appointments
 
