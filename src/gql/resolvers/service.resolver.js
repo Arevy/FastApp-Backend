@@ -46,18 +46,36 @@ export default {
 	},
 
 	Mutation: {
-		createService: async (_, { name, category, isActive }, context) => {
+		createService: async (_, { input }, context) => {
 			const newService = new context.di.model.Service({
+				name: input.name,
+				category: input.category,
+				isActive: input.isActive,
+				description: input.description,
+				imageBase64: input.imageBase64,
+				imageContentType: input.imageContentType,
+			});
+
+			return newService.save();
+		},
+		updateService: async (
+			_,
+			{
+				_id,
 				name,
 				category,
 				isActive,
-			});
-			await newService.save();
-			return newService;
-		},
-
-		updateService: async (_, { _id, name, category }, context) => {
-			const updateData = { name, category };
+				description,
+				imageBase64,
+				imageContentType,
+			},
+			context
+		) => {
+			const updateData = { name, category, isActive, description };
+			if (imageBase64 && imageContentType) {
+				updateData.imageData = Buffer.from(imageBase64, 'base64');
+				updateData.imageContentType = imageContentType;
+			}
 			const updatedService = await context.di.model.Service.findByIdAndUpdate(
 				_id,
 				{ $set: updateData },

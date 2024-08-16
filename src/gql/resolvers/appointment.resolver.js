@@ -131,13 +131,14 @@ export default {
 	},
 
 	Mutation: {
-		createAppointment: async (_, { userId, serviceId, date }, context) => {
+		createAppointment: async (_, { userId, serviceId, date, status }, context) => {
 			try {
 				const newAppointment = new context.di.model.Appointment({
 					userId,
 					serviceId,
 					date: new Date(date),
-					status: 'pending'
+					status: 'pending',
+					status: status || 'pending'
 				});
 				await newAppointment.save();
 				return newAppointment;

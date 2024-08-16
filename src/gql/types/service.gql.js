@@ -1,16 +1,30 @@
 import { gql } from 'apollo-server-express';
 
 export default /* GraphQL */ gql`
+  scalar Upload
+
   type Service {
     _id: ID!
     name: String
     category: String
     isActive: Boolean
+    description: String
+    imageBase64: String
+    imageContentType: String
+  }
+
+  input CreateServiceInput {
+    name: String!
+    category: String!
+    isActive: Boolean!
+    description: String
+    imageBase64: String
+    imageContentType: String
   }
 
   type Mutation {
-    createService(name: String!, category: String!, isActive: Boolean!): Service
-    updateService(_id: ID!, name: String, category: String): Service
+    createService(input: CreateServiceInput!): Service
+    updateService(_id: ID!, input: CreateServiceInput): Service
     toggleServiceActive(_id: ID!): Service
     deleteService(_id: ID!): DeleteResult
   }

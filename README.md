@@ -18,6 +18,7 @@ The backend is powered by **Node.js, GraphQL, Apollo Server, Express, and Mongoo
 - Limitation on the number of registered users.
 - Secure storage of user data in MongoDB.
 - JWT-based authentication.
+- Full appointment management with service and user details.
 
 ### 📝 Requirements
 
@@ -124,6 +125,7 @@ This backend API, built with Node.js, GraphQL, Apollo Server, Express, and Mongo
         email: "example@domain.com"
         password: "password123"
         userType: NORMAL_USER
+        userName: "userName1"
       ) {
         token
       }
@@ -153,8 +155,13 @@ This backend API, built with Node.js, GraphQL, Apollo Server, Express, and Mongo
         userId: "userID"
         serviceId: "serviceID"
         date: "2023-04-01T09:00:00.000Z"
+        status: "pending"
       ) {
-        uuid
+        _id
+        userId
+        serviceId
+        date
+        status
       }
     }
     ```
@@ -166,11 +173,13 @@ This backend API, built with Node.js, GraphQL, Apollo Server, Express, and Mongo
     ```graphql
     mutation {
       updateAppointment(
-        uuid: "appointmentID"
+        _id: "appointmentID"
         newDate: "2023-05-01T09:00:00.000Z"
         newStatus: "confirmed"
       ) {
-        uuid
+        _id
+        date
+        status
       }
     }
     ```
@@ -180,7 +189,7 @@ This backend API, built with Node.js, GraphQL, Apollo Server, Express, and Mongo
   - Example:
     ```graphql
     mutation {
-      deleteAppointment(uuid: "appointmentID") {
+      deleteAppointment(_id: "appointmentID") {
         success
         message
       }
@@ -195,8 +204,11 @@ This backend API, built with Node.js, GraphQL, Apollo Server, Express, and Mongo
   - Example:
     ```graphql
     mutation {
-      createService(name: "Service Name", category: "Service Category") {
-        serviceId
+      createService(name: "Service Name", category: "Service Category", isActive: true) {
+        _id
+        name
+        category
+        isActive
       }
     }
     ```
@@ -208,11 +220,15 @@ This backend API, built with Node.js, GraphQL, Apollo Server, Express, and Mongo
     ```graphql
     mutation {
       updateService(
-        serviceId: "serviceID"
+        _id: "serviceID"
         name: "New Service Name"
         category: "New Category"
+        isActive: true
       ) {
-        serviceId
+        _id
+        name
+        category
+        isActive
       }
     }
     ```
@@ -222,9 +238,63 @@ This backend API, built with Node.js, GraphQL, Apollo Server, Express, and Mongo
   - Example:
     ```graphql
     mutation {
-      deleteService(serviceId: "serviceID") {
+      deleteService(_id: "serviceID") {
         success
         message
+      }
+    }
+    ```
+- **Create Service with optional details**:
+
+  - Mutation: `createService`
+
+    - Example:
+
+      ```graphql
+      mutation {
+        createService(
+          name: "Service Name"
+          category: "Service Category"
+          isActive: true
+          description: "Detailed description of the service"
+          imageBase64: "base64encodedimage"
+          imageContentType: "image/png"
+        ) {
+          _id
+          name
+          category
+          isActive
+          description
+          imageBase64
+          imageContentType
+        }
+      }
+      ```
+
+      #### Update Service
+
+- **Update Service with optional details**:
+
+  - Mutation: `updateService`
+  - Example:
+    ```graphql
+    mutation {
+      updateService(
+        _id: "serviceID"
+        name: "Updated Service Name"
+        category: "Updated Category"
+        isActive: true
+        description: "Updated detailed description of the service"
+        imageBase64: "updatedBase64encodedimage"
+        imageContentType: "image/jpeg"
+      ) {
+        _id
+        name
+        category
+        isActive
+        description
+        imageBase64
+        imageContentType
       }
     }
     ```
@@ -252,17 +322,17 @@ This section provides the input variables required to replicate the current data
 
 ````graphql
 mutation {
-  registerUser(email: "user@example.com", password: "VerySecure123!", userType: NORMAL_USER) {
+  registerUser(email: "user@example.com", password: "VerySecure123!", userType: NORMAL_USER, userName: "userName1") {
     token
   }
 }
 mutation {
-  registerUser(email: "sdadd@dsds.dd", password: "SecurePass!", userType: SERVICE_USER) {
+  registerUser(email: "sdadd@dsds.dd", password: "SecurePass!", userType: SERVICE_USER, userName: "userName2") {
     token
   }
 }
 mutation {
-  registerUser(email: "abcb@aa.aaa", password: "AnotherPass123!", userType: ADMIN_USER) {
+  registerUser(email: "abcb@aa.aaa", password: "AnotherPass123!", userType: ADMIN_USER, userName: "userName3") {
     token
   }
 }
@@ -359,12 +429,113 @@ mutation {
   }
 }
 
+### Service Management with optional details
+
+- **Create Service with optional details**:
+
+  - Mutation: `createService`
+  - Example:
+    ```graphql
+    mutation {
+      createService(
+        name: "Luxury Spa Package",
+        category: "Health & Wellness",
+        isActive: true,
+        description: "A full day luxury spa experience with a variety of treatments to relax and rejuvenate.",
+        imageBase64: "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABGklEQVR42mNkQA...",
+        imageContentType: "image/png"
+      ) {
+        _id
+        name
+        category
+        isActive
+        description
+        imageBase64
+        imageContentType
+      }
+    }
+    ```
+
+  - Another Example:
+    ```graphql
+    mutation {
+      createService(
+        name: "Therapeutic Massage",
+        category: "Massage Therapy",
+        isActive: true,
+        description: "Deep tissue massage to relieve chronic muscle tension and improve circulation.",
+        imageBase64: "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABGklEQVR42mNkQA...",
+        imageContentType: "image/jpeg"
+      ) {
+        _id
+        name
+        category
+        isActive
+        description
+        imageBase64
+        imageContentType
+      }
+    }
+    ```
+
+#### Update Service
+
+- **Update Service**:
+
+  - Mutation: `updateService`
+  - Example:
+    ```graphql
+    mutation {
+      updateService(
+        _id: "serviceID",
+        name: "Updated Luxury Spa Package",
+        category: "Health & Wellness",
+        isActive: true,
+        description: "Updated description: A luxurious spa day with additional aromatherapy treatments.",
+        imageBase64: "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABGklEQVR42mNkQA...",
+        imageContentType: "image/png"
+      ) {
+        _id
+        name
+        category
+        isActive
+        description
+        imageBase64
+        imageContentType
+      }
+    }
+    ```
+
+  - Another Example:
+    ```graphql
+    mutation {
+      updateService(
+        _id: "anotherServiceID",
+        name: "Updated Therapeutic Massage",
+        category: "Massage Therapy",
+        isActive: true,
+        description: "Updated description: Enhanced deep tissue massage with essential oils for better relaxation.",
+        imageBase64: "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABGklEQVR42mNkQA...",
+        imageContentType: "image/jpeg"
+      ) {
+        _id
+        name
+        category
+        isActive
+        description
+        imageBase64
+        imageContentType
+      }
+    }
+    ```
+
 ### Additional Appointments
 
 **Create Additional Appointments**:
 ```graphql
 mutation {
   createAppointment(userId: "662bc297f2ad210410380b57", serviceId: "663529419602541ee2bcbc36", date: "2024-08-02T09:00:00Z") {
+    _id
     userId
     serviceId
     date
@@ -373,6 +544,7 @@ mutation {
 }
 mutation {
   createAppointment(userId: "662bc2b8f2ad210410380b5c", serviceId: "663529669602541ee2bcbc3a", date: "2024-08-02T11:00:00Z") {
+    _id
     userId
     serviceId
     date
@@ -381,6 +553,7 @@ mutation {
 }
 mutation {
   createAppointment(userId: "662bc297f2ad210410380b57", serviceId: "663529939602541ee2bcbc3e", date: "2024-08-03T09:00:00Z") {
+    _id
     userId
     serviceId
     date
@@ -389,6 +562,7 @@ mutation {
 }
 mutation {
   createAppointment(userId: "662bd1afe4695b13c71979ce", serviceId: "663529aa9602541ee2bcbc40", date: "2024-08-03T10:00:00Z") {
+    _id
     userId
     serviceId
     date
@@ -397,6 +571,7 @@ mutation {
 }
 mutation {
   createAppointment(userId: "662bc2b8f2ad210410380b5c", serviceId: "663529f59602541ee2bcbc42", date: "2024-08-03T11:00:00Z") {
+    _id
     userId
     serviceId
     date
@@ -405,6 +580,7 @@ mutation {
 }
 mutation {
   createAppointment(userId: "662bc297f2ad210410380b57", serviceId: "663529339602541ee2bcbc34", date: "2024-08-01T12:00:00Z") {
+    _id
     userId
     serviceId
     date
@@ -413,10 +589,12 @@ mutation {
 }
 mutation {
   createAppointment(userId: "662bd1afe4695b13c71979ce", serviceId: "663529559602541ee2bcbc38", date: "2024-08-02T10:00:00Z") {
+    _id
     userId
     serviceId
     date
     status
   }
 }
+
 ````

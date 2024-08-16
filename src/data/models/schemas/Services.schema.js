@@ -17,6 +17,9 @@ const ServicesSchema = new Schema(
 			required: true,
 			default: true,
 		},
+		description: { type: String, required: false },
+		imageBase64: { type: String, required: false },
+		imageContentType: { type: String, required: false },
 	},
 	{ timestamps: true }
 );

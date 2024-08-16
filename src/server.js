@@ -5,7 +5,10 @@ import favicon from 'serve-favicon';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import cors from 'cors';
-import { ApolloServerPluginLandingPageGraphQLPlayground, ApolloServerPluginLandingPageDisabled } from 'apollo-server-core';
+import {
+	ApolloServerPluginLandingPageGraphQLPlayground,
+	ApolloServerPluginLandingPageDisabled,
+} from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-express';
 import { UserInputError } from 'apollo-server-errors';
 
@@ -22,13 +25,23 @@ import routesManager from './routes/routesManager.js';
 
 mongoose.set('strictQuery', true);
 
-if (environmentVariablesConfig.formatConnection === 'DNSseedlist' && environmentVariablesConfig.mongoDNSseedlist !== '') {
+if (
+	environmentVariablesConfig.formatConnection === 'DNSseedlist' &&
+  environmentVariablesConfig.mongoDNSseedlist !== ''
+) {
 	mongoose.connect(environmentVariablesConfig.mongoDNSseedlist);
 } else {
-	if (environmentVariablesConfig.mongoUser !== '' && environmentVariablesConfig.mongoPass !== '') {
-		mongoose.connect(`mongodb://${environmentVariablesConfig.mongoUser}:${environmentVariablesConfig.mongoPass}@${environmentVariablesConfig.dbHost}:${environmentVariablesConfig.dbPort}/${environmentVariablesConfig.database}`);
+	if (
+		environmentVariablesConfig.mongoUser !== '' &&
+    environmentVariablesConfig.mongoPass !== ''
+	) {
+		mongoose.connect(
+			`mongodb://${environmentVariablesConfig.mongoUser}:${environmentVariablesConfig.mongoPass}@${environmentVariablesConfig.dbHost}:${environmentVariablesConfig.dbPort}/${environmentVariablesConfig.database}`
+		);
 	} else {
-		mongoose.connect(`mongodb://${environmentVariablesConfig.dbHost}:${environmentVariablesConfig.dbPort}/${environmentVariablesConfig.database}`);
+		mongoose.connect(
+			`mongodb://${environmentVariablesConfig.dbHost}:${environmentVariablesConfig.dbPort}/${environmentVariablesConfig.database}`
+		);
 	}
 }
 
@@ -40,13 +53,22 @@ db.on('error', (err) => {
 
 db.once('open', () => {
 	if (environmentVariablesConfig.environment !== ENVIRONMENT.DEVELOPMENT) {
-		logger.info(`Connected with MongoDB service (${ENVIRONMENT.PRODUCTION} mode)`);
+		logger.info(
+			`Connected with MongoDB service (${ENVIRONMENT.PRODUCTION} mode)`
+		);
 	} else {
-		if (environmentVariablesConfig.formatConnection === 'DNSseedlist' && environmentVariablesConfig.mongoDNSseedlist !== '') {
+		if (
+			environmentVariablesConfig.formatConnection === 'DNSseedlist' &&
+      environmentVariablesConfig.mongoDNSseedlist !== ''
+		) {
 			// logger.info(`Connected with MongoDB service at "${environmentVariablesConfig.mongoDNSseedlist}" using database "${environmentVariablesConfig.database}" (${ENVIRONMENT.DEVELOPMENT} mode)`);
-			logger.info(`Connected with MongoDB service at "${environmentVariablesConfig.formatConnection}" using database "${environmentVariablesConfig.database}" (${ENVIRONMENT.DEVELOPMENT} mode)`);
+			logger.info(
+				`Connected with MongoDB service at "${environmentVariablesConfig.formatConnection}" using database "${environmentVariablesConfig.database}" (${ENVIRONMENT.DEVELOPMENT} mode)`
+			);
 		} else {
-			logger.info(`Connected with MongoDB service at "${environmentVariablesConfig.dbHost}" in port "${environmentVariablesConfig.dbPort}" using database "${environmentVariablesConfig.database}" (${ENVIRONMENT.DEVELOPMENT} mode)`);
+			logger.info(
+				`Connected with MongoDB service at "${environmentVariablesConfig.dbHost}" in port "${environmentVariablesConfig.dbPort}" using database "${environmentVariablesConfig.database}" (${ENVIRONMENT.DEVELOPMENT} mode)`
+			);
 		}
 	}
 
@@ -59,8 +81,13 @@ const initApplication = async () => {
 		app.use(helmet());
 	} else {
 		// Allow GraphQL Playground on development environments
-		app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }));
+		app.use(
+			helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false })
+		);
 	}
+	app.use(express.json({ limit: '50mb' }));
+	app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
 	app.use(cors({ credentials: true }));
 	const __dirname = path.dirname(fileURLToPath(import.meta.url));
 	app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -92,10 +119,14 @@ const initApplication = async () => {
 	});
 
 	app.listen(environmentVariablesConfig.port, () => {
-		getListOfIPV4Address().forEach(ip => {
-			logger.info(`Application running on: http://${ip}:${environmentVariablesConfig.port}`);
+		getListOfIPV4Address().forEach((ip) => {
+			logger.info(
+				`Application running on: http://${ip}:${environmentVariablesConfig.port}`
+			);
 			if (environmentVariablesConfig.environment !== ENVIRONMENT.PRODUCTION) {
-				logger.info(`GraphQL Playground running on: http://${ip}:${environmentVariablesConfig.port}${server.graphqlPath}`);
+				logger.info(
+					`GraphQL Playground running on: http://${ip}:${environmentVariablesConfig.port}${server.graphqlPath}`
+				);
 			}
 		});
 	});
