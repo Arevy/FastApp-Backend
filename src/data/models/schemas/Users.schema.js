@@ -11,6 +11,7 @@ const UsersSchema = new Schema({
 	userType: {
 		type: String,
 		enum: ['NORMAL_USER', 'SERVICE_USER', 'ADMIN_USER'],
+		default: 'NORMAL_USER',
 		required: true,
 	},
 	email: {
@@ -47,7 +48,7 @@ const UsersSchema = new Schema({
 		type: Date,
 		default: Date.now,
 	},
-});
+}, { timestamps: true });
 
 /**
  * Hash the password of user before save on database

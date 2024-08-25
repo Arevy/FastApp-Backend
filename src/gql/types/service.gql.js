@@ -34,6 +34,7 @@ export default /* GraphQL */ gql`
     allAppointments: [Appointment]
     getService(_id: ID!): Service
     listAllServices: [Service]
+    listServicesByCategory(category: String!): [Service]
   }
 
   type DeleteResult {

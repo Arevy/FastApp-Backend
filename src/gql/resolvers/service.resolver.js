@@ -33,6 +33,10 @@ export default {
 			return context.di.model.Service.findById(serviceId);
 		},
 
+		listServicesByCategory: async (_, { category }, context) => {
+			return context.di.model.Service.find({ category }).lean();
+		},
+
 		listAllServices: async (_, args, context) => {
 			try {
 				return await context.di.model.Service.find({})
