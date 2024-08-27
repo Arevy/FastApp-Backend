@@ -44,29 +44,46 @@ export default {
 				throw new UserInputError('Data provided is not valid');
 			}
 
-			await new context.di.model.Users({
+			const newUser = new context.di.model.Users({
 				email,
 				password,
 				userType,
 				userName,
-			}).save();
+			});
+			await newUser.save();
 
-			const user = await context.di.model.Users.findOne({ email }).lean();
+			let user = await context.di.model.Users.findOne({ email }).lean();
+
+			if (user.userType === 'SERVICE_USER') {
+				const newService = new context.di.model.Service({
+					name: userName,
+					category: 'default-category', 
+					isActive: true,
+					description: '',
+					imageBase64: '',
+					imageContentType: '',
+				});
+				const savedService = await newService.save();
+
+				user = await context.di.model.Users.findByIdAndUpdate(
+					user._id,
+					{
+						serviceId: savedService._id,
+					},
+					{ new: true }
+				).lean();
+			}
 
 			return {
 				token: context.di.jwt.createAuthToken(
+					user._id,
 					user.email,
 					user.isAdmin,
 					user.isActive,
-					user.userName
+					user.userName,
+					user.serviceId
 				),
-				user: {
-					_id: user._id,
-					email: user.email,
-					isAdmin: user.isAdmin,
-					isActive: user.isActive,
-					userName: user.userName,
-				},
+				user: user,
 			};
 		},
 
@@ -138,6 +155,32 @@ export default {
 				user: user,
 			};
 		},
+
+		// updatePassword: async (_, { _id, newPassword }, context) => {
+		// 	try {
+		// 	  const hashedPassword = await bcrypt.hash(newPassword, 10);
+		// 	  const updateResult = await context.di.model.Users.findByIdAndUpdate(
+		// 			_id,
+		// 			{ password: hashedPassword },
+		// 			{ new: true }
+		// 	  ).lean();
+
+		// 	  if (!updateResult) {
+		// 			throw new Error('User not found');
+		// 	  }
+
+		// 	  return {
+		// 			success: true,
+		// 			message: 'Password successfully updated.',
+		// 	  };
+		// 	} catch (error) {
+		// 	  console.error('Error updating password:', error);
+		// 	  return {
+		// 			success: false,
+		// 			message: 'Password update failed.',
+		// 	  };
+		// 	}
+		// },
 
 		/**
      * It allows to user to delete their account permanently (this action does not delete the records associated with the user, it only deletes their user account)

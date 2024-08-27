@@ -41,9 +41,15 @@ export default {
 			context
 		) => {
 			const updateData = {};
-			if (isAdmin !== undefined) {updateData.isAdmin = isAdmin;}
-			if (isActive !== undefined) {updateData.isActive = isActive;}
-			if (userType) {updateData.userType = userType;}
+			if (isAdmin !== undefined) {
+				updateData.isAdmin = isAdmin;
+			}
+			if (isActive !== undefined) {
+				updateData.isActive = isActive;
+			}
+			if (userType) {
+				updateData.userType = userType;
+			}
 
 			const updateResult = await context.di.model.Users.findByIdAndUpdate(
 				_id, // Use _id for identification
@@ -58,6 +64,40 @@ export default {
 				};
 			}
 			return { success: true, message: 'User updated successfully.' };
+		},
+
+		updateUserDetails: async (_, { _id, email, userName }, context) => {
+			try {
+				const updateData = {};
+				if (email) {
+					updateData.email = email;
+				}
+				if (userName) {
+					updateData.userName = userName;
+				}
+
+				const updateResult = await context.di.model.Users.findByIdAndUpdate(
+					_id,
+					{ $set: updateData },
+					{ new: true }
+				).lean();
+
+				if (!updateResult) {
+					throw new Error('User not found');
+				}
+
+				return {
+					success: true,
+					message: 'User details successfully updated.',
+					user: updateResult,
+				};
+			} catch (error) {
+				console.error('Error updating user details:', error);
+				return {
+					success: false,
+					message: 'User details update failed.',
+				};
+			}
 		},
 	},
 };

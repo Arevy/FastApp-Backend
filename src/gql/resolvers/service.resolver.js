@@ -60,34 +60,40 @@ export default {
 				imageContentType: input.imageContentType,
 			});
 
-			return newService.save();
-		},
-		updateService: async (
-			_,
-			{
-				_id,
-				name,
-				category,
-				isActive,
-				description,
-				imageBase64,
-				imageContentType,
-			},
-			context
-		) => {
-			const updateData = { name, category, isActive, description };
-			if (imageBase64 && imageContentType) {
-				updateData.imageData = Buffer.from(imageBase64, 'base64');
-				updateData.imageContentType = imageContentType;
+			const savedService = await newService.save();
+
+			// Asociază serviciul cu utilizatorul de tip SERVICE_USER
+			if (context.user.userType === 'SERVICE_USER') {
+				await context.di.model.Users.findByIdAndUpdate(context.user._id, {
+					serviceId: savedService._id,
+				});
 			}
+
+			return savedService;
+		},
+
+		updateService: async (_, { userId, input }, context) => {
+			const user = await context.di.model.Users.findById(userId);
+			if (!user || user.userType !== 'SERVICE_USER') {
+				throw new Error('User not found or not a service user');
+			}
+
+			const serviceId = user.serviceId;
+			if (!serviceId) {
+				throw new Error('Service not associated with this user');
+			}
+
 			const updatedService = await context.di.model.Service.findByIdAndUpdate(
-				_id,
-				{ $set: updateData },
+				serviceId,
+				{ $set: input },
 				{ new: true }
-			);
+			).lean();
+
 			if (!updatedService) {
+				console.error('Service not found or update failed for serviceId:', serviceId, 'and userId:', userId);
 				throw new Error('Service not found or update failed');
 			}
+
 			return updatedService;
 		},
 

@@ -11,6 +11,7 @@ export default /* GraphQL */ gql`
     description: String
     imageBase64: String
     imageContentType: String
+    userId: ID! 
   }
 
   input CreateServiceInput {
@@ -22,9 +23,18 @@ export default /* GraphQL */ gql`
     imageContentType: String
   }
 
+  input UpdateServiceInput {
+    name: String
+    category: String
+    isActive: Boolean
+    description: String
+    imageBase64: String
+    imageContentType: String
+  }
+
   type Mutation {
     createService(input: CreateServiceInput!): Service
-    updateService(_id: ID!, input: CreateServiceInput): Service
+    updateService(userId: ID!, input: UpdateServiceInput): Service
     toggleServiceActive(_id: ID!): Service
     deleteService(_id: ID!): DeleteResult
   }

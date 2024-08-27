@@ -17,6 +17,13 @@ export default gql`
     lastLogin: String
     userType: UserType!
     password: String
+    serviceId: ID
+  }
+
+  type UpdateUserDetailsResult {
+    success: Boolean!
+    message: String
+    user: User
   }
 
   type Query {
@@ -38,6 +45,12 @@ export default gql`
       isActive: Boolean
       userType: UserType
     ): UpdateResult
+
+    updateUserDetails(
+      _id: ID!
+      email: String
+      userName: String
+    ): UpdateUserDetailsResult
   }
 
   type UpdateResult {
