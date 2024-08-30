@@ -37,17 +37,10 @@ const UsersSchema = new Schema(
 			type: Boolean,
 			default: false,
 		},
-		// serviceId: {
-		// 	type: mongoose.Schema.Types.ObjectId,
-		// 	ref: 'Service',
-		// 	required: false,
-		// },
 		serviceId: {
 			type: Schema.Types.ObjectId,
-			ref: 'Service',
-			required: function () {
-				return this.userType === 'SERVICE_USER' && this.serviceId != null;
-			},
+			ref: 'services',
+			required: false,
 			default: null,
 		},
 		isActive: {

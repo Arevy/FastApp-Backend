@@ -54,26 +54,6 @@ export default {
 
 			let user = await context.di.model.Users.findOne({ email }).lean();
 
-			if (user.userType === 'SERVICE_USER') {
-				const newService = new context.di.model.Service({
-					name: userName,
-					category: 'default-category', 
-					isActive: true,
-					description: '',
-					imageBase64: '',
-					imageContentType: '',
-				});
-				const savedService = await newService.save();
-
-				user = await context.di.model.Users.findByIdAndUpdate(
-					user._id,
-					{
-						serviceId: savedService._id,
-					},
-					{ new: true }
-				).lean();
-			}
-
 			return {
 				token: context.di.jwt.createAuthToken(
 					user._id,

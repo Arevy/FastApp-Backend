@@ -92,6 +92,7 @@ typings/
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
+dump.rdb
 
 # next.js build output
 .next

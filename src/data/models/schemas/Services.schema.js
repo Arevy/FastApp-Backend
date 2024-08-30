@@ -20,6 +20,12 @@ const ServicesSchema = new Schema(
 		description: { type: String, required: false },
 		imageBase64: { type: String, required: false },
 		imageContentType: { type: String, required: false },
+		userId: {
+			type: Schema.Types.ObjectId,
+			ref: 'users',
+			required: false,
+			default: null,
+		},
 	},
 	{ timestamps: true }
 );
