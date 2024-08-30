@@ -4,14 +4,14 @@ const Schema = mongoose.Schema;
 
 const AppointmentsSchema = new Schema({
 	userId: {
-		type: mongoose.Schema.Types.ObjectId,
-		ref: 'User',
+		type: String,
+		ref: 'users',
 		required: true,
 		index: true // Index this field for better query performance
 	},
 	serviceId: {
-		type: mongoose.Schema.Types.ObjectId,
-		ref: 'Service',
+		type: String,
+		ref: 'services',
 		required: true,
 		index: true // Index this field for better query performance
 	},

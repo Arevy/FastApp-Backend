@@ -2,12 +2,126 @@
  * All resolvers related to appointments
  * @typedef {Object}
  */
+import mongoose from 'mongoose';
 
 export default {
 	Query: {
 		userAppointments: async (_, { userId }, context) => {
-			return context.di.model.Appointment.find({ userId }).lean();
+			return context.di.model.Appointment.find({ userId })
+				.populate('userId')
+				.populate('serviceId')
+				.lean()
+				.then((appointments) =>
+					appointments.map((appointment) => ({
+						...appointment,
+						user: appointment.userId,
+						service: appointment.serviceId,
+					}))
+				);
 		},
+		fetchServiceAppointments: async (_, { serviceId }, context) => {
+			try {
+			  console.log('Starting fetchServiceAppointments resolver');
+			  console.log(`Received serviceId: ${serviceId}`);
+		
+			  // Asigură-te că folosești 'new' pentru a crea un ObjectId
+			  const appointments = await context.di.model.Appointment.find({
+					serviceId: new mongoose.Types.ObjectId(serviceId),
+			  }).lean();
+		
+			  console.log('Appointments found:', appointments);
+		
+			  if (appointments.length === 0) {
+					return [];
+			  }
+		
+			  const populatedAppointments = await Promise.all(
+					appointments.map(async (appointment) => {
+				  console.log('Current appointment:', appointment);
+				  const user = await context.di.model.Users.findById(appointment.userId).lean();
+				  console.log('User found:', user);
+		
+				  const service = await context.di.model.Service.findById(appointment.serviceId).lean();
+				  console.log('Service found:', service);
+		
+				  return {
+							...appointment,
+							user: user || null,
+							service: service || null,
+				  };
+					})
+			  );
+		
+			  console.log('Populated Appointments:', populatedAppointments);
+			  return populatedAppointments;
+			} catch (error) {
+			  console.error('Error fetching service appointments:', error);
+			  throw new Error('Failed to fetch service appointments');
+			}
+		},
+		// fetchServiceAppointments: async (_, { serviceId }, context) => {
+		// 	try {
+
+		// 		const populatedAppointments = await context.di.model.Appointment.aggregate([
+		// 		  {
+		// 			$match: { serviceId: new mongoose.Types.ObjectId(serviceId) }  // Convertim stringul în ObjectId
+		// 		  },
+		// 		  {
+		// 			$lookup: {
+		// 			  from: 'users',  // Numele colecției de utilizatori
+		// 			  localField: 'userId',  // Câmpul din Appointment care se potriveste cu _id-ul din Users
+		// 			  foreignField: '_id',
+		// 			  as: 'userDetails'
+		// 			}
+		// 		  },
+		// 		  {
+		// 			$unwind: { 
+		// 			  path: '$userDetails',
+		// 			  preserveNullAndEmptyArrays: true  // În cazul în care un userId nu se găsește în Users, păstrează documentul
+		// 			}
+		// 		  },
+		// 		  {
+		// 			$lookup: {
+		// 			  from: 'services',  // Numele colecției de servicii
+		// 			  localField: 'serviceId',  // Câmpul din Appointment care se potriveste cu _id-ul din Services
+		// 			  foreignField: '_id',
+		// 			  as: 'serviceDetails'
+		// 			}
+		// 		  },
+		// 		  {
+		// 			$unwind: {
+		// 			  path: '$serviceDetails',
+		// 			  preserveNullAndEmptyArrays: true  // În cazul în care un serviceId nu se găsește în Services, păstrează documentul
+		// 			}
+		// 		  },
+		// 		  {
+		// 			$project: {
+		// 			  _id: 1,
+		// 			  user: {
+		// 				_id: '$userDetails._id',
+		// 				email: '$userDetails.email',
+		// 				userName: '$userDetails.userName'
+		// 			  },
+		// 			  service: {
+		// 				_id: '$serviceDetails._id',
+		// 				name: '$serviceDetails.name',
+		// 				category: '$serviceDetails.category'
+		// 			  },
+		// 			  date: 1,
+		// 			  status: 1
+		// 			}
+		// 		  }
+		// 		]);
+				
+		// 		console.log('Populated Appointments:', populatedAppointments);
+		// 		return populatedAppointments;
+				
+				  
+		// 	} catch (error) {
+		// 		console.error('Error fetching service appointments:', error);
+		// 		throw new Error('Failed to fetch service appointments');
+		// 	}
+		// },
 		listAllAppointmentsShort: async (parent, args, context) => {
 			const SORT_CRITERIA = { isAdmin: 'desc', registrationDate: 'asc' };
 			const appointments = await context.di.model.Appointment.find()
@@ -43,19 +157,17 @@ export default {
 			// For each appointment, find the corresponding user and service.
 			const populatedAppointments = await Promise.all(
 				appointments.map(async (appointment) => {
-					const user = await context.di.model.User.findById(
+					const user = await context.di.model.Users.findById(
 						appointment.userId
 					).lean();
 					const service = await context.di.model.Service.findById(
 						appointment.serviceId
 					).lean();
 
-					// Return a new object that combines the appointment with user and service info.
-					// If user or service is not found, set them as null or a default object.
 					return {
 						...appointment,
-						user: user || null, // You could set default user info if needed
-						service: service || null, // You could set default service info if needed
+						user: user || null,
+						service: service || null,
 					};
 				})
 			);
@@ -66,31 +178,32 @@ export default {
 		listAllAppointmentsFull: async (_, args, context) => {
 			try {
 				// Fetch all appointments with user details
-				const appointmentsWithUsers = await context.di.model.Appointment.aggregate([
-					{
-						$lookup: {
-							from: 'users',
-							localField: 'userId',
-							foreignField: '_id',
-							as: 'userDetails',
-						},
-					},
-					{
-						$unwind: {
-							path: '$userDetails',
-							preserveNullAndEmptyArrays: true,
-						},
-					},
-					{
-						$project: {
-							_id: 1,
-							user: '$userDetails',
-							serviceId: 1,
-							date: 1,
-							status: 1,
-						},
-					},
-				]).exec();
+				const appointmentsWithUsers =
+          await context.di.model.Appointment.aggregate([
+          	{
+          		$lookup: {
+          			from: 'users',
+          			localField: 'userId',
+          			foreignField: '_id',
+          			as: 'userDetails',
+          		},
+          	},
+          	{
+          		$unwind: {
+          			path: '$userDetails',
+          			preserveNullAndEmptyArrays: true,
+          		},
+          	},
+          	{
+          		$project: {
+          			_id: 1,
+          			user: '$userDetails',
+          			serviceId: 1,
+          			date: 1,
+          			status: 1,
+          		},
+          	},
+          ]).exec();
 
 				console.log(
 					'Appointments with user details:',
@@ -127,26 +240,29 @@ export default {
 				throw new Error('Failed to fetch appointments details.');
 			}
 		},
-
 	},
 
 	Mutation: {
-		createAppointment: async (_, { userId, serviceId, date, status }, context) => {
+		createAppointment: async (
+			_,
+			{ userId, serviceId, date, status },
+			context
+		) => {
 			try {
 				const newAppointment = new context.di.model.Appointment({
 					userId,
 					serviceId,
 					date: new Date(date),
-					status: 'pending',
-					status: status || 'pending'
+					status: status || 'pending',
 				});
 				await newAppointment.save();
+				console.log('Appointment created successfully:', newAppointment);
 				return newAppointment;
 			} catch (error) {
 				console.error('Error creating appointment:', error);
 				throw new Error('Failed to create appointment');
 			}
-		},		
+		},
 		updateAppointment: async (_, { _id, newDate, newStatus }, context) => {
 			try {
 				const updateFields = {};
@@ -157,11 +273,12 @@ export default {
 					updateFields.status = newStatus;
 				}
 
-				const updatedAppointment = await context.di.model.Appointment.findByIdAndUpdate(
-					_id,
-					{ $set: updateFields },
-					{ new: true }
-				);
+				const updatedAppointment =
+          await context.di.model.Appointment.findByIdAndUpdate(
+          	_id,
+          	{ $set: updateFields },
+          	{ new: true }
+          );
 
 				if (!updatedAppointment) {
 					throw new Error('Appointment not found');

@@ -2,13 +2,19 @@ import { gql } from 'apollo-server-express';
 
 export default /* GraphQL */ gql`
   type Mutation {
-    createAppointment(userId: ID!, serviceId: ID!, date: String!, status: String!): Appointment
+    createAppointment(
+      userId: ID!
+      serviceId: ID!
+      date: String!
+      status: String!
+    ): Appointment
     updateAppointment(_id: ID!, newDate: String, newStatus: String): Appointment
     deleteAppointment(_id: ID!): DeleteResult
   }
 
   type Query {
     userAppointments(userId: ID!): [Appointment]
+    fetchServiceAppointments(serviceId: ID!): [Appointment]
     """
     Get list of all Appointments on database
     """
@@ -33,8 +39,8 @@ export default /* GraphQL */ gql`
 
   type Appointment {
     _id: ID!
-    user: User
-    service: Service
+    user: User      
+    service: Service 
     date: String!
     status: String!
   }
@@ -42,6 +48,7 @@ export default /* GraphQL */ gql`
   type User {
     _id: ID!
     email: String!
+    userName: String!
     isAdmin: Boolean
     isActive: Boolean
     registrationDate: String
