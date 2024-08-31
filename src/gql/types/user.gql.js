@@ -45,6 +45,8 @@ export default gql`
       isActive: Boolean
       userType: UserType
     ): UpdateResult
+    
+    deleteUserById(_id: ID!): DeleteResult
 
     updateUserDetails(
       _id: ID!

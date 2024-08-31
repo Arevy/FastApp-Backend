@@ -61,7 +61,8 @@ export default {
 					user.isAdmin,
 					user.isActive,
 					user.userName,
-					user.serviceId
+					user.serviceId,
+					user.userType
 				),
 				user: user,
 			};

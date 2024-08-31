@@ -17,7 +17,11 @@ export default {
 		},
 	},
 	Mutation: {
-		createUser: async (_, { email, userName, password, userType, isActive }, context) => {
+		createUser: async (
+			_,
+			{ email, userName, password, userType, isActive },
+			context
+		) => {
 			try {
 				const newUser = new context.di.model.Users({
 					email,
@@ -29,9 +33,30 @@ export default {
 				});
 				await newUser.save();
 				return newUser;
-			} catch (error){
+			} catch (error) {
 				console.error('Error creating user:', error);
 				throw new Error('Failed to create user');
+			}
+		},
+
+		deleteUserById: async (_, { _id }, context) => {
+			try {
+				const deleteResult = await context.di.model.Users.findByIdAndDelete(
+					_id
+				);
+				if (!deleteResult) {
+					return {
+						success: false,
+						message: 'User not found or deletion failed.',
+					};
+				}
+				return {
+					success: true,
+					message: 'User successfully deleted.',
+				};
+			} catch (error) {
+				console.error('Error deleting user:', error);
+				throw new Error('Failed to delete user');
 			}
 		},
 

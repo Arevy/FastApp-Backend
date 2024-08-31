@@ -21,42 +21,36 @@ export default {
 		},
 		fetchServiceAppointments: async (_, { serviceId }, context) => {
 			try {
-			  console.log('Starting fetchServiceAppointments resolver');
-			  console.log(`Received serviceId: ${serviceId}`);
-		
-			  // Asigură-te că folosești 'new' pentru a crea un ObjectId
-			  const appointments = await context.di.model.Appointment.find({
+				const appointments = await context.di.model.Appointment.find({
 					serviceId: new mongoose.Types.ObjectId(serviceId),
-			  }).lean();
-		
-			  console.log('Appointments found:', appointments);
-		
-			  if (appointments.length === 0) {
+				}).lean();
+
+				if (appointments.length === 0) {
 					return [];
-			  }
-		
-			  const populatedAppointments = await Promise.all(
+				}
+
+				const populatedAppointments = await Promise.all(
 					appointments.map(async (appointment) => {
-				  console.log('Current appointment:', appointment);
-				  const user = await context.di.model.Users.findById(appointment.userId).lean();
-				  console.log('User found:', user);
-		
-				  const service = await context.di.model.Service.findById(appointment.serviceId).lean();
-				  console.log('Service found:', service);
-		
-				  return {
+						const user = await context.di.model.Users.findById(
+							appointment.userId
+						).lean();
+
+						const service = await context.di.model.Service.findById(
+							appointment.serviceId
+						).lean();
+
+						return {
 							...appointment,
 							user: user || null,
 							service: service || null,
-				  };
+						};
 					})
-			  );
-		
-			  console.log('Populated Appointments:', populatedAppointments);
-			  return populatedAppointments;
+				);
+
+				return populatedAppointments;
 			} catch (error) {
-			  console.error('Error fetching service appointments:', error);
-			  throw new Error('Failed to fetch service appointments');
+				console.error('Error fetching service appointments:', error);
+				throw new Error('Failed to fetch service appointments');
 			}
 		},
 		// fetchServiceAppointments: async (_, { serviceId }, context) => {
@@ -75,7 +69,7 @@ export default {
 		// 			}
 		// 		  },
 		// 		  {
-		// 			$unwind: { 
+		// 			$unwind: {
 		// 			  path: '$userDetails',
 		// 			  preserveNullAndEmptyArrays: true  // În cazul în care un userId nu se găsește în Users, păstrează documentul
 		// 			}
@@ -112,11 +106,10 @@ export default {
 		// 			}
 		// 		  }
 		// 		]);
-				
+
 		// 		console.log('Populated Appointments:', populatedAppointments);
 		// 		return populatedAppointments;
-				
-				  
+
 		// 	} catch (error) {
 		// 		console.error('Error fetching service appointments:', error);
 		// 		throw new Error('Failed to fetch service appointments');
@@ -178,32 +171,31 @@ export default {
 		listAllAppointmentsFull: async (_, args, context) => {
 			try {
 				// Fetch all appointments with user details
-				const appointmentsWithUsers =
-          await context.di.model.Appointment.aggregate([
-          	{
-          		$lookup: {
-          			from: 'users',
-          			localField: 'userId',
-          			foreignField: '_id',
-          			as: 'userDetails',
-          		},
-          	},
-          	{
-          		$unwind: {
-          			path: '$userDetails',
-          			preserveNullAndEmptyArrays: true,
-          		},
-          	},
-          	{
-          		$project: {
-          			_id: 1,
-          			user: '$userDetails',
-          			serviceId: 1,
-          			date: 1,
-          			status: 1,
-          		},
-          	},
-          ]).exec();
+				const appointmentsWithUsers = context.di.model.Appointment.aggregate([
+					{
+						$lookup: {
+							from: 'users',
+							localField: 'userId',
+							foreignField: '_id',
+							as: 'userDetails',
+						},
+					},
+					{
+						$unwind: {
+							path: '$userDetails',
+							preserveNullAndEmptyArrays: true,
+						},
+					},
+					{
+						$project: {
+							_id: 1,
+							user: '$userDetails',
+							serviceId: 1,
+							date: 1,
+							status: 1,
+						},
+					},
+				]).exec();
 
 				console.log(
 					'Appointments with user details:',
@@ -273,12 +265,11 @@ export default {
 					updateFields.status = newStatus;
 				}
 
-				const updatedAppointment =
-          await context.di.model.Appointment.findByIdAndUpdate(
-          	_id,
-          	{ $set: updateFields },
-          	{ new: true }
-          );
+				const updatedAppointment = await context.di.model.Appointment.findByIdAndUpdate(
+					_id,
+					{ $set: updateFields },
+					{ new: true }
+				);
 
 				if (!updatedAppointment) {
 					throw new Error('Appointment not found');
