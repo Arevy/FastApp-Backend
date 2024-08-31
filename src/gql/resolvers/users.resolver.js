@@ -34,7 +34,6 @@ export default {
 				await newUser.save();
 				return newUser;
 			} catch (error) {
-				console.error('Error creating user:', error);
 				throw new Error('Failed to create user');
 			}
 		},
@@ -55,7 +54,6 @@ export default {
 					message: 'User successfully deleted.',
 				};
 			} catch (error) {
-				console.error('Error deleting user:', error);
 				throw new Error('Failed to delete user');
 			}
 		},
@@ -77,7 +75,7 @@ export default {
 			}
 
 			const updateResult = await context.di.model.Users.findByIdAndUpdate(
-				_id, // Use _id for identification
+				_id, 
 				updateData,
 				{ new: true }
 			);
@@ -117,7 +115,6 @@ export default {
 					user: updateResult,
 				};
 			} catch (error) {
-				console.error('Error updating user details:', error);
 				return {
 					success: false,
 					message: 'User details update failed.',

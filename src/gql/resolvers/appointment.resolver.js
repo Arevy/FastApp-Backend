@@ -49,7 +49,6 @@ export default {
 
 				return populatedAppointments;
 			} catch (error) {
-				console.error('Error fetching service appointments:', error);
 				throw new Error('Failed to fetch service appointments');
 			}
 		},
@@ -133,21 +132,15 @@ export default {
 
 		listAllAppointmentsById: async (_, args, context) => {
 			try {
-				// You can use find() to get all appointments if no args provided
-				// Or findById() if you're looking for a specific appointment by ID.
 				const appointments = await context.di.model.Appointment.find({}).lean();
 				return appointments;
 			} catch (error) {
-				console.error('Error fetching appointments:', error);
 				throw new Error('Failed to fetch appointments');
 			}
 		},
 
 		listAllAppointments: async (_, args, context) => {
-			// First, find all appointments.
 			const appointments = await context.di.model.Appointment.find().lean();
-
-			// For each appointment, find the corresponding user and service.
 			const populatedAppointments = await Promise.all(
 				appointments.map(async (appointment) => {
 					const user = await context.di.model.Users.findById(
@@ -170,7 +163,6 @@ export default {
 
 		listAllAppointmentsFull: async (_, args, context) => {
 			try {
-				// Fetch all appointments with user details
 				const appointmentsWithUsers = await context.di.model.Appointment.aggregate([
 					{
 						$lookup: {
@@ -185,6 +177,9 @@ export default {
 							path: '$userDetails',
 							preserveNullAndEmptyArrays: true,
 						},
+					},
+					{
+						$match: { userDetails: { $ne: null } },
 					},
 					{
 						$project: {
@@ -213,12 +208,22 @@ export default {
 					acc[service._id.toString()] = service;
 					return acc;
 				}, {});
-		
-				const fullAppointments = appointmentsWithUsers.map((appointment) => ({
-					...appointment,
-					service: serviceMap[appointment.serviceId?.toString()] || null,
-				}));
-		
+
+				const fullAppointments = appointmentsWithUsers.map((appointment) => {
+					const service = serviceMap[appointment.serviceId?.toString()] || null;
+
+					if (!service) {
+						console.warn(
+							`Warning: Service not found for appointment ID: ${appointment._id}`
+						);
+					}
+
+					return {
+						...appointment,
+						service,
+					};
+				});
+
 				return fullAppointments;
 			} catch (error) {
 				throw new Error('Failed to fetch appointments details.');
@@ -241,10 +246,8 @@ export default {
 					status: status || 'pending',
 				});
 				await newAppointment.save();
-				console.log('Appointment created successfully:', newAppointment);
 				return newAppointment;
 			} catch (error) {
-				console.error('Error creating appointment:', error);
 				throw new Error('Failed to create appointment');
 			}
 		},
@@ -270,7 +273,6 @@ export default {
 
 				return updatedAppointment;
 			} catch (error) {
-				console.error('Error updating appointment:', error);
 				throw new Error('Failed to update appointment');
 			}
 		},
@@ -286,7 +288,6 @@ export default {
 						: 'Appointment not found',
 				};
 			} catch (error) {
-				console.error('Error deleting appointment:', error);
 				throw new Error(
 					'An error occurred while trying to delete the appointment'
 				);

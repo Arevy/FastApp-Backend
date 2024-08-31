@@ -44,7 +44,6 @@ export default {
 			}
 
 			const service = await context.di.model.Service.findById(user.serviceId);
-			console.log({ user });
 			if (!service) {
 				throw new Error('Service not found');
 			}
@@ -64,9 +63,8 @@ export default {
 			try {
 				return await context.di.model.Service.find({})
 					.select('+isActive')
-					.lean(); // Use `.select()` if `isActive` is set to not return by default
+					.lean(); 
 			} catch (error) {
-				console.error('Error retrieving services:', error);
 				throw new Error('Failed to retrieve services');
 			}
 		},
@@ -75,7 +73,6 @@ export default {
 	Mutation: {
 		createService: async (_, { input }, context) => {
 			try {
-				// Pas 1: Creăm un nou service cu datele primite
 				const newService = new context.di.model.Service({
 					userId: input.userId,
 					name: input.name,
@@ -86,12 +83,8 @@ export default {
 					imageContentType: input.imageContentType,
 				});
 
-				// Salvăm noul service în baza de date și așteptăm finalizarea
 				const savedService = await newService.save();
 
-				console.log('Service created:', savedService);
-
-				// Pas 2: Dacă utilizatorul este de tip SERVICE_USER, actualizăm serviceId în profilul acestuia
 				if (input.userType === 'SERVICE_USER') {
 					const userUpdateResult =
 					await context.di.model.Users.findByIdAndUpdate(
@@ -101,26 +94,15 @@ export default {
 					);
 
 					if (!userUpdateResult) {
-						console.error(
-							'Failed to update user with serviceId:',
-							savedService._id
-						);
 						throw new Error('User update failed');
 					}
-
-					console.log('User updated with serviceId:', savedService._id);
 				}
 
-				// Pas 3: Eliminăm cheia din Redis asociată cu lista de programări ale serviciului pentru a invalida cache-ul
 				const cacheKey = `serviceAppointments:${savedService._id}`;
 				await redis.del(cacheKey);
 
-				console.log('Cache invalidated for:', cacheKey);
-
-				// Returnăm serviciul salvat
 				return savedService;
 			} catch (error) {
-				console.error('Error in createService:', error);
 				throw new Error('Service creation failed');
 			}
 		},
