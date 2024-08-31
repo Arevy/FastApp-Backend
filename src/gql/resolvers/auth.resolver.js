@@ -107,7 +107,6 @@ export default {
 
 			const user = await context.di.model.Users.findOne({
 				email,
-				isActive: true,
 			}).lean();
 
 			if (!user) {
