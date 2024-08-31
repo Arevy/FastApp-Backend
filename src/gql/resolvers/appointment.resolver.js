@@ -171,7 +171,7 @@ export default {
 		listAllAppointmentsFull: async (_, args, context) => {
 			try {
 				// Fetch all appointments with user details
-				const appointmentsWithUsers = context.di.model.Appointment.aggregate([
+				const appointmentsWithUsers = await context.di.model.Appointment.aggregate([
 					{
 						$lookup: {
 							from: 'users',
@@ -196,42 +196,35 @@ export default {
 						},
 					},
 				]).exec();
-
-				console.log(
-					'Appointments with user details:',
-					JSON.stringify(appointmentsWithUsers, null, 2)
-				);
-
+		
+				if (!Array.isArray(appointmentsWithUsers)) {
+					throw new Error('Expected appointmentsWithUsers to be an array');
+				}
+		
 				const serviceIds = appointmentsWithUsers
 					.map((a) => a.serviceId)
 					.filter((id) => id != null);
-				console.log('Service IDs being queried:', serviceIds);
 
 				const services = await context.di.model.Service.find({
 					_id: { $in: serviceIds },
 				}).lean();
-				console.log('Services found:', JSON.stringify(services, null, 2));
-
+		
 				const serviceMap = services.reduce((acc, service) => {
 					acc[service._id.toString()] = service;
 					return acc;
 				}, {});
-
+		
 				const fullAppointments = appointmentsWithUsers.map((appointment) => ({
 					...appointment,
 					service: serviceMap[appointment.serviceId?.toString()] || null,
 				}));
-
-				console.log(
-					'Combined full appointments:',
-					JSON.stringify(fullAppointments, null, 2)
-				);
+		
 				return fullAppointments;
 			} catch (error) {
-				console.error('Error fetching appointments with details:', error);
 				throw new Error('Failed to fetch appointments details.');
 			}
 		},
+		
 	},
 
 	Mutation: {
