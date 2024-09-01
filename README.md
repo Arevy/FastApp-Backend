@@ -122,8 +122,8 @@ This backend API, built with Node.js, GraphQL, Apollo Server, Express, and Mongo
     ```graphql
     mutation {
       registerUser(
-        email: "example@domain.com"
-        password: "password123"
+        email: "user@example.com"
+        password: "VerySecure123!"
         userType: NORMAL_USER
         userName: "userName1"
       ) {
@@ -137,8 +137,55 @@ This backend API, built with Node.js, GraphQL, Apollo Server, Express, and Mongo
   - Example:
     ```graphql
     mutation {
-      authUser(email: "example@domain.com", password: "password123") {
+      authUser(email: "user@example.com", password: "VerySecure123!") {
         token
+      }
+    }
+    ```
+
+- **Update User Admin Status**:
+  - Mutation: `updateUserAdminStatus`
+  - Example:
+    ```graphql
+    mutation {
+      updateUserAdminStatus(
+        _id: "66d1c3f6d3492739cd784378"
+        isAdmin: true
+        isActive: true
+        userType: ADMIN_USER
+      ) {
+        success
+        message
+      }
+    }
+    ```
+
+- **Delete User Account**:
+  - Mutation: `deleteMyUserAccount`
+  - Example:
+    ```graphql
+    mutation {
+      deleteMyUserAccount {
+        success
+        message
+      }
+    }
+    ```
+
+- **List All Users**:
+  - Query: `listAllUsers`
+  - Example:
+    ```graphql
+    query {
+      listAllUsers {
+        _id
+        email
+        isAdmin
+        isActive
+        userName
+        registrationDate
+        lastLogin
+        userType
       }
     }
     ```
@@ -152,14 +199,22 @@ This backend API, built with Node.js, GraphQL, Apollo Server, Express, and Mongo
     ```graphql
     mutation {
       createAppointment(
-        userId: "userID"
-        serviceId: "serviceID"
-        date: "2023-04-01T09:00:00.000Z"
+        userId: "662bd1afe4695b13c71979ce"
+        serviceId: "663529aa9602541ee2bcbc40"
+        date: "2024-08-03T10:00:00.000Z"
         status: "pending"
       ) {
         _id
-        userId
-        serviceId
+        user {
+          _id
+          email
+          userName
+        }
+        service {
+          _id
+          name
+          category
+        }
         date
         status
       }
@@ -167,14 +222,13 @@ This backend API, built with Node.js, GraphQL, Apollo Server, Express, and Mongo
     ```
 
 - **Update Appointment**:
-
   - Mutation: `updateAppointment`
   - Example:
     ```graphql
     mutation {
       updateAppointment(
-        _id: "appointmentID"
-        newDate: "2023-05-01T09:00:00.000Z"
+        _id: "66353a099602541ee2bcbc5f"
+        newDate: "2024-08-10T09:00:00.000Z"
         newStatus: "confirmed"
       ) {
         _id
@@ -189,9 +243,32 @@ This backend API, built with Node.js, GraphQL, Apollo Server, Express, and Mongo
   - Example:
     ```graphql
     mutation {
-      deleteAppointment(_id: "appointmentID") {
+      deleteAppointment(_id: "66353a099602541ee2bcbc5f") {
         success
         message
+      }
+    }
+    ```
+
+- **List All Appointments**:
+  - Query: `listAllAppointmentsFull`
+  - Example:
+    ```graphql
+    query {
+      listAllAppointmentsFull {
+        _id
+        user {
+          _id
+          email
+          userName
+        }
+        service {
+          _id
+          name
+          category
+        }
+        date
+        status
       }
     }
     ```
@@ -204,11 +281,21 @@ This backend API, built with Node.js, GraphQL, Apollo Server, Express, and Mongo
   - Example:
     ```graphql
     mutation {
-      createService(name: "Service Name", category: "Service Category", isActive: true) {
+      createService(
+        name: "Premium Full Body Massage"
+        category: "Luxury Health"
+        isActive: true
+        description: "A luxurious full body massage"
+        imageBase64: ""
+        imageContentType: "image/png"
+      ) {
         _id
         name
         category
         isActive
+        description
+        imageBase64
+        imageContentType
       }
     }
     ```
@@ -220,15 +307,21 @@ This backend API, built with Node.js, GraphQL, Apollo Server, Express, and Mongo
     ```graphql
     mutation {
       updateService(
-        _id: "serviceID"
-        name: "New Service Name"
-        category: "New Category"
+        _id: "662bd287e4695b13c71979d4"
+        name: "Updated Service Name"
+        category: "Updated Category"
         isActive: true
+        description: "Updated service description"
+        imageBase64: "updatedBase64encodedimage"
+        imageContentType: "image/jpeg"
       ) {
         _id
         name
         category
         isActive
+        description
+        imageBase64
+        imageContentType
       }
     }
     ```
@@ -238,7 +331,7 @@ This backend API, built with Node.js, GraphQL, Apollo Server, Express, and Mongo
   - Example:
     ```graphql
     mutation {
-      deleteService(_id: "serviceID") {
+      deleteService(_id: "662bd287e4695b13c71979d4") {
         success
         message
       }
@@ -275,19 +368,12 @@ This backend API, built with Node.js, GraphQL, Apollo Server, Express, and Mongo
 
 - **Update Service with optional details**:
 
-  - Mutation: `updateService`
+- **List All Services**:
+  - Query: `listAllServices`
   - Example:
     ```graphql
-    mutation {
-      updateService(
-        _id: "serviceID"
-        name: "Updated Service Name"
-        category: "Updated Category"
-        isActive: true
-        description: "Updated detailed description of the service"
-        imageBase64: "updatedBase64encodedimage"
-        imageContentType: "image/jpeg"
-      ) {
+    query {
+      listAllServices {
         _id
         name
         category
@@ -322,17 +408,17 @@ This section provides the input variables required to replicate the current data
 
 ````graphql
 mutation {
-  registerUser(email: "user@example.com", password: "VerySecure123!", userType: NORMAL_USER, userName: "userName1") {
+  registerUser(email: "user1@example.com", password: "VerySecure123!", userType: NORMAL_USER, userName: "userName1") {
     token
   }
 }
 mutation {
-  registerUser(email: "sdadd@dsds.dd", password: "SecurePass!", userType: SERVICE_USER, userName: "userName2") {
+  registerUser(email: "user2@example.com", password: "SecurePass!", userType: SERVICE_USER, userName: "userName2") {
     token
   }
 }
 mutation {
-  registerUser(email: "abcb@aa.aaa", password: "AnotherPass123!", userType: ADMIN_USER, userName: "userName3") {
+  registerUser(email: "user3@example.com", password: "AnotherPass123!", userType: ADMIN_USER, userName: "userName3") {
     token
   }
 }
