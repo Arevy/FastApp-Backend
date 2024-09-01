@@ -23,7 +23,9 @@ The backend is powered by **Node.js, GraphQL, Apollo Server, Express, and Mongoo
 ### 📝 Requirements
 
 - MongoDB 7.0+
-- Node.js 18.15+
+- Node.js  
+  1. Production: 18.15+
+  2. Development: 16.15.1
 
 ### 📚 Setup Instructions
 
@@ -39,6 +41,10 @@ The backend is powered by **Node.js, GraphQL, Apollo Server, Express, and Mongoo
 - MongoDB connection settings (`MONGO_FORMAT_CONNECTION`, `MONGO_HOST`, etc.).
 - `SECRET`: JWT secret key (keep it secure).
 - `DURATION`: JWT token duration.
+
+### 📝 Frontend Usage
+
+- Backend must be running. I recommend use my [frontend boilerplate](https://github.com/Arevy/FastApp-Frontend)
 
 **Admin User Configuration:**
 Access the database to set a user's `isAdmin` field to `true`.
